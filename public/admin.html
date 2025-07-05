@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Chismografo Familiar</title>
+    <link rel="icon" type="image/png" href="img/sticker-smiley.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+
+    <!-- Enlazamos la misma hoja de estilos que usan las otras páginas -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="admin-panel">
+        <h1>Panel de Administración</h1>
+        
+        <div class="admin-section">
+            <h2>Crear Nueva Cuenta Familiar</h2>
+            <form id="create-user-form">
+                <div class="form-grupo">
+                    <label for="new-username">ID de Familia (Usuario):</label>
+                    <input type="text" id="new-username" name="new-username" required>
+                </div>
+                <div class="form-grupo">
+                    <label for="new-password">Contraseña Inicial:</label>
+                    <input type="password" id="new-password" name="new-password" required>
+                </div>
+                <button type="submit">Crear Cuenta</button>
+            </form>
+        </div>
+
+        <!-- Próximamente: más secciones como "Ver todas las respuestas", etc. -->
+
+    </div>
+
+    <!-- Enlazamos un nuevo archivo JS específico para este panel -->
+    <script src="js/admin.js"></script>
+</body>
+</html>

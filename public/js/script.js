@@ -1,7 +1,9 @@
-// Espera a que todo el contenido de la página se cargue antes de ejecutar el script
+// Espera a que todo el contenido del DOM se cargue antes de ejecutar cualquier código.
 document.addEventListener('DOMContentLoaded', function() {
 
-    // 1. Seleccionamos todos los elementos que vamos a manipular (esto no cambia)
+    // --- SELECCIÓN DE ELEMENTOS DEL DOM ---
+    // ¡AQUÍ ESTÁ LA PARTE IMPORTANTE!
+    // Nos aseguramos de que TODAS las variables estén declaradas aquí.
     const loginForm = document.getElementById('login-form');
     
     const tituloPrincipal = document.getElementById('titulo-principal');
@@ -10,12 +12,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const seccionFamiliar = document.getElementById('login-familiar');
     const seccionAdmin = document.getElementById('login-admin');
 
-    const linkIrAAdmin = document.getElementById('ir-a-admin');
+    const linkIrAAdmin = document.getElementById('ir-a-admin'); // La variable que causaba el error
     const linkIrAFamiliar = document.getElementById('ir-a-familiar');
 
-    // 2. Función para cambiar al modo Administrador (esto no cambia)
+    // --- FUNCIONES PARA CAMBIAR ENTRE MODOS DE LOGIN ---
     function mostrarLoginAdmin(event) {
-        event.preventDefault(); 
+        event.preventDefault();
         seccionFamiliar.classList.add('hidden');
         linkIrAAdmin.classList.add('hidden');
         seccionAdmin.classList.remove('hidden');
@@ -24,9 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
         botonSubmit.textContent = 'Acceder';
     }
 
-    // 3. Función para volver al modo Familiar (esto no cambia)
     function mostrarLoginFamiliar(event) {
-        event.preventDefault(); 
+        event.preventDefault();
         seccionAdmin.classList.add('hidden');
         linkIrAFamiliar.classList.add('hidden');
         seccionFamiliar.classList.remove('hidden');
@@ -35,51 +36,54 @@ document.addEventListener('DOMContentLoaded', function() {
         botonSubmit.textContent = '¡Entrar!';
     }
     
-    // 4. Asignamos las funciones a los eventos 'click' de los enlaces (esto no cambia)
+    // Asignamos las funciones a los eventos 'click' de los enlaces.
     linkIrAAdmin.addEventListener('click', mostrarLoginAdmin);
     linkIrAFamiliar.addEventListener('click', mostrarLoginFamiliar);
 
-// En public/js/script.js
+    // --- LÓGICA DE ENVÍO DEL FORMULARIO ---
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const esLoginAdmin = !seccionAdmin.classList.contains('hidden');
 
-loginForm.addEventListener('submit', async (event) => { // ¡Hacemos la función async!
-    event.preventDefault(); 
-    const esLoginAdmin = !seccionAdmin.classList.contains('hidden');
-
-    if (esLoginAdmin) {
-        // Lógica para el login de ADMIN
-        const adminUser = document.getElementById('adminUser').value;
-        const adminPass = document.getElementById('adminPass').value;
-
-        try {
-            const response = await fetch('/api/login/admin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ adminUser, adminPass })
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                // Si el servidor responde con un error (ej. 401 Unauthorized)
-                throw new Error(result.message);
+        if (esLoginAdmin) {
+            // LÓGICA PARA EL LOGIN DE ADMIN
+            const adminUser = document.getElementById('adminUser').value;
+            const adminPass = document.getElementById('adminPass').value;
+            try {
+                const response = await fetch('/api/login/admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminUser, adminPass })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message);
+                window.location.href = '/admin.html';
+            } catch (error) {
+                alert(`Error de login: ${error.message}`);
             }
-
-            alert(result.message);
-            // ¡Próximamente! Aquí redirigiremos al panel de admin
-            // window.location.href = '/admin.html';
-            console.log("Redirigiendo al panel de admin (en construcción)...");
-
-        } catch (error) {
-            alert(`Error de login: ${error.message}`);
+        
+        } else {
+            // LÓGICA PARA EL LOGIN FAMILIAR
+            const username = document.getElementById('familiaId').value;
+            const password = document.getElementById('clave').value;
+            if (!username.trim() || !password.trim()) {
+                alert("Por favor, ingresa tu ID de Familia y tu Clave Secreta.");
+                return;
+            }
+            try {
+                const response = await fetch('/api/login/user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message);
+                localStorage.setItem('idUsuarioLogueado', username);
+                alert(result.message);
+                window.location.href = 'preguntas.html';
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
         }
-    
-    } else {
-        // Lógica para el login Familiar (no cambia por ahora)
-        const familiaId = document.getElementById('familiaId').value;
-        localStorage.setItem('idUsuarioLogueado', familiaId);
-        alert('¡Bienvenido! Cargando el chismografo...');
-        window.location.href = 'preguntas.html';
-    }
-});
-
+    });
 });
