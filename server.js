@@ -150,6 +150,33 @@ app.get('/api/resultados', (req, res) => {
         participantes: Object.values(participantesUnicos)
     });
 });
+// ¡NUEVA RUTA DE LOGIN PARA ADMIN!
+app.post('/api/login/admin', (req, res) => {
+    const { adminUser, adminPass } = req.body;
+
+    // 1. Leemos nuestra base de datos de usuarios
+    const usersDB = JSON.parse(fs.readFileSync('./users.json', 'utf8'));
+    const adminAccount = usersDB.admin;
+
+    // 2. Verificamos que el usuario sea 'admin'
+    if (adminUser !== adminAccount.username) {
+        // Enviamos un error genérico para no dar pistas a atacantes
+        return res.status(401).json({ message: 'Usuario o contraseña incorrectos.' });
+    }
+
+    // 3. ¡LA MAGIA! Comparamos la contraseña enviada con el hash guardado
+    bcrypt.compare(adminPass, adminAccount.passwordHash, function(err, result) {
+        if (result === true) {
+            // ¡Éxito! La contraseña coincide
+            console.log("Login de admin exitoso.");
+            res.status(200).json({ message: 'Login exitoso.', role: 'admin' });
+        } else {
+            // Fracaso. La contraseña no coincide
+            console.log("Intento de login de admin fallido.");
+            res.status(401).json({ message: 'Usuario o contraseña incorrectos.' });
+        }
+    });
+});
 
 
 // =================================================================

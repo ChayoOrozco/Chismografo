@@ -1,0 +1,14 @@
+{
+    "admin": {
+      "username": "admin",
+      "passwordHash": "$2b$10$EcUGub7XunYxoOftvwxpjOgfGavzMXwGBwa8FGGx7ckv.E9SHjiiW",
+      "role": "admin"
+    },
+    "users": [
+      {
+        "username": "FamiliaPerez",
+        "passwordHash": "$2b$10$unhashdeejemploparafamiliaperez",
+        "role": "user"
+      }
+    ]
+  }
