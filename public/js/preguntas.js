@@ -1,96 +1,76 @@
-// Envolvemos todo en DOMContentLoaded para asegurar que el HTML esté listo.
-// Hacemos la función 'async' para poder usar 'await' al cargar los datos.
 document.addEventListener('DOMContentLoaded', async () => {
     
     // --- ELEMENTOS DEL DOM ---
+    // Asegúrate de que todas estas declaraciones estén presentes y correctas.
     const questionCard = document.getElementById('question-card');
     const questionText = document.getElementById('question-text');
     const answerInput = document.getElementById('answer-input');
     const nextButton = document.getElementById('next-button');
     
     const endScreen = document.getElementById('end-screen');
+    // ¡AQUÍ ESTÁ LA LÍNEA QUE PROBABLEMENTE FALTABA O ERA INCORRECTA!
     const generateButton = document.getElementById('generate-question-button');
     const viewResultsButton = document.getElementById('view-results-button');
 
     // --- DATOS ---
-    // El array de preguntas ahora empieza vacío. Lo llenaremos desde el servidor.
     let preguntas = [];
-    // Este array guardará temporalmente las respuestas del usuario en esta sesión.
     let respuestas = [];
     let preguntaActualIndex = 0;
+    const idUsuario = localStorage.getItem('idUsuarioLogueado') || 'usuario_anonimo';
 
-    // --- FUNCIÓN PARA CARGAR LAS PREGUNTAS DESDE EL SERVIDOR ---
+    // --- FUNCIÓN PARA CARGAR PREGUNTAS (INTELIGENTE) ---
     async function cargarPreguntas() {
         try {
-            // Hacemos una petición GET a nuestra API para traer las preguntas.
-            const response = await fetch('/api/preguntas');
-            if (!response.ok) {
-                throw new Error('No se pudo conectar con el servidor.');
-            }
-            // Llenamos nuestro array local con los datos que nos dio el servidor.
+            const response = await fetch(`/api/preguntas/${idUsuario}`);
+            if (!response.ok) throw new Error('No se pudo conectar con el servidor.');
             preguntas = await response.json();
         } catch (error) {
             console.error("Error al cargar las preguntas:", error);
-            questionText.textContent = "¡Ups! No pudimos cargar las preguntas. Intenta de nuevo más tarde.";
-            nextButton.disabled = true; // Desactivamos el botón si no hay preguntas.
+            questionText.textContent = "¡Ups! No pudimos cargar las preguntas.";
+            nextButton.disabled = true;
         }
     }
 
     // --- FUNCIONES DE LA INTERFAZ ---
-
-    // Muestra la pregunta actual en la pantalla.
     function mostrarPregunta() {
+        if (preguntas.length === 0) {
+            questionText.textContent = "¡Estás al día con todas las preguntas!";
+            answerInput.style.display = 'none';
+            nextButton.textContent = 'Ver Resultados';
+            nextButton.onclick = () => { window.location.href = 'resultados.html'; };
+            return;
+        }
+
         if (preguntaActualIndex < preguntas.length) {
             questionText.textContent = preguntas[preguntaActualIndex];
             answerInput.value = '';
             answerInput.focus();
         } else {
-            // Si ya no hay preguntas, finalizamos el proceso.
             finalizarChismografo();
         }
     }
 
-    // Se ejecuta cuando el usuario ha respondido todas las preguntas.
     async function finalizarChismografo() {
-        // Obtenemos el ID del usuario que guardamos en el localStorage durante el login.
-        const idUsuario = localStorage.getItem('idUsuarioLogueado') || 'usuario_anonimo';
-
-        // Preparamos el "paquete" de datos que enviaremos al servidor.
-        const payload = {
-            usuario: idUsuario,
-            respuestas: respuestas
-        };
-        
+        const payload = { usuario: idUsuario, respuestas: respuestas };
         try {
-            // Hacemos la petición POST a nuestro servidor para guardar los datos.
             const response = await fetch('/api/respuestas', {
-                method: 'POST', // Indicamos que es una petición para enviar datos.
-                headers: {
-                    'Content-Type': 'application/json' // Le decimos que los datos van en formato JSON.
-                },
-                body: JSON.stringify(payload) // Convertimos nuestro objeto JS a un string JSON.
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
             });
-
-            if (!response.ok) {
-                throw new Error('El servidor no pudo guardar las respuestas.');
-            }
-
+            if (!response.ok) throw new Error('El servidor no pudo guardar las respuestas.');
             const result = await response.json();
             console.log('Respuesta del servidor:', result.message);
-
         } catch (error) {
             console.error('Error al enviar las respuestas:', error);
-            alert('Hubo un problema al guardar tus respuestas. Revisa la consola.');
+            alert('Hubo un problema al guardar tus respuestas.');
         }
 
-        // Mostramos la pantalla final.
         questionCard.classList.add('hidden');
         endScreen.classList.remove('hidden');
     }
 
-    // --- EVENT LISTENERS (MANEJADORES DE EVENTOS) ---
-
-    // Cuando el usuario hace clic en "Siguiente Pregunta".
+    // --- EVENT LISTENERS ---
     nextButton.addEventListener('click', () => {
         respuestas.push({
             pregunta: preguntas[preguntaActualIndex],
@@ -100,21 +80,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         mostrarPregunta();
     });
 
-    // Botón para generar una nueva pregunta (funcionalidad futura).
-    generateButton.addEventListener('click', () => {
-        alert("¡Próximamente! Podrás añadir tus propias preguntas al chismografo.");
+    generateButton.addEventListener('click', async () => {
+        const nuevaPregunta = prompt("Escribe la nueva pregunta:");
+        if (nuevaPregunta && nuevaPregunta.trim() !== '') {
+            try {
+                const response = await fetch('/api/preguntas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nuevaPregunta: nuevaPregunta.trim() })
+                });
+                if (!response.ok) throw new Error('El servidor no pudo guardar la pregunta.');
+                const result = await response.json();
+                alert(result.message);
+                alert("Ahora, por favor responde la pregunta que acabas de crear.");
+                window.location.reload();
+            } catch (error) {
+                console.error('Error al añadir la pregunta:', error);
+                alert('Hubo un problema al guardar tu pregunta.');
+            }
+        }
     });
 
-    // Botón para ver resultados.
     viewResultsButton.addEventListener('click', () => {
         window.location.href = 'resultados.html';
     });
 
     // --- INICIO DE LA EJECUCIÓN ---
-    // 1. Esperamos a que las preguntas se carguen desde el servidor.
     await cargarPreguntas();
-    // 2. Una vez cargadas, mostramos la primera pregunta.
-    if (preguntas.length > 0) {
-        mostrarPregunta();
-    }
+    mostrarPregunta();
 });

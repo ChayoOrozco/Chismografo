@@ -1,133 +1,161 @@
-// 1. Requerimos las herramientas. ¡Añadimos 'fs'!
+// 1. Requerimos las herramientas necesarias
 const express = require('express');
-const fs = require('fs'); // ¡NUEVO! File System module
+const fs = require('fs'); // Módulo para interactuar con el sistema de archivos
 
-// 2. Inicializamos la aplicación
+// 2. Inicializamos la aplicación de Express
 const app = express();
 const PORT = 3000;
 
 // =================================================================
 // --- MIDDLEWARE ---
+// Se ejecutan en orden por cada petición que llega al servidor.
 // =================================================================
+
+// Sirve todos los archivos estáticos (HTML, CSS, JS del cliente, imágenes) desde la carpeta 'public'
 app.use(express.static('public'));
+// Parsea (interpreta) el cuerpo de las peticiones que vienen en formato JSON
 app.use(express.json());
 
 // =================================================================
-// --- BASE DE DATOS EN ARCHIVO JSON ---
+// --- BASE DE DATOS EN ARCHIVOS JSON ---
+// Definimos las rutas a nuestros archivos que actúan como base de datos.
 // =================================================================
 
-// Definimos la ruta de nuestro "archivo-base de datos"
-const DB_FILE = './respuestas.json';
+const RESPUESTAS_DB_FILE = './respuestas.json';
+const PREGUNTAS_DB_FILE = './preguntas.json';
 
-// Función para leer los datos del archivo
-function leerDatos() {
+// Función reutilizable para leer datos de cualquier archivo JSON
+function leerDatos(filePath) {
     try {
-        // Si el archivo no existe, fs.readFileSync lanzará un error
-        const data = fs.readFileSync(DB_FILE, 'utf8');
-        return JSON.parse(data); // Convertimos el string del archivo a un objeto/array
+        if (fs.existsSync(filePath)) {
+            const data = fs.readFileSync(filePath, 'utf8');
+            return JSON.parse(data);
+        }
+        return []; // Si el archivo no existe, devuelve un array vacío
     } catch (error) {
-        // Si el archivo no existe o hay otro error, empezamos con un array vacío
-        console.log("No se encontró el archivo de base de datos. Creando uno nuevo.");
+        console.error(`Error al leer el archivo ${filePath}:`, error);
         return [];
     }
 }
 
-// Función para escribir los datos en el archivo
-function escribirDatos(data) {
-    // Usamos null, 2 para que el JSON se guarde formateado y sea legible
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+// Función reutilizable para escribir datos en cualquier archivo JSON
+function escribirDatos(filePath, data) {
+    const dataString = JSON.stringify(data, null, 2); // El 'null, 2' formatea el JSON para que sea legible
+    fs.writeFileSync(filePath, dataString);
 }
 
-// Cargamos los datos iniciales cuando arranca el servidor
-let respuestasGuardadas = leerDatos();
-
-// Mantenemos las preguntas en memoria, ya que son estáticas por ahora
-const preguntas = [
-    "¿Cuál es tu recuerdo familiar más divertido?",
-    "Si pudieras tener un superpoder, ¿cuál sería y por qué?",
-    "¿Qué canción te pone de buen humor al instante?",
-    "¿Cuál es el mejor consejo que te han dado?",
-    "Si tu vida fuera una película, ¿qué título tendría?"
-];
 
 // =================================================================
-// --- API DE DATOS (RUTAS) ---
+// --- API DE DATOS (RUTAS / ENDPOINTS) ---
+// Estas son las URLs que nuestro frontend puede "llamar".
 // =================================================================
 
-// Ruta GET para obtener la lista de preguntas
-app.get('/api/preguntas', (req, res) => {
-    res.json(preguntas);
+// --- Rutas para PREGUNTAS ---
+
+// GET /api/preguntas/:usuario  <-- ¡LA RUTA INTELIGENTE!
+// Devuelve una lista de preguntas personalizada para el usuario especificado.
+app.get('/api/preguntas/:usuario', (req, res) => {
+    // Obtenemos el nombre de usuario de los parámetros de la URL
+    const usuarioActual = req.params.usuario;
+
+    // Cargamos la versión más reciente de preguntas y respuestas desde los archivos
+    const todasLasPreguntas = leerDatos(PREGUNTAS_DB_FILE);
+    const todasLasRespuestas = leerDatos(RESPUESTAS_DB_FILE);
+
+    // Buscamos si este usuario ya ha enviado respuestas antes
+    const submissionDelUsuario = todasLasRespuestas.find(s => s.usuario === usuarioActual);
+
+    if (!submissionDelUsuario) {
+        // CASO 1: El usuario es nuevo. Le enviamos todas las preguntas.
+        console.log(`Usuario nuevo '${usuarioActual}'. Enviando ${todasLasPreguntas.length} preguntas.`);
+        return res.json(todasLasPreguntas);
+    }
+
+    // CASO 2: El usuario ya existe. Filtramos las preguntas que ya ha contestado.
+    const preguntasYaRespondidas = submissionDelUsuario.respuestas.map(r => r.pregunta);
+    const preguntasPendientes = todasLasPreguntas.filter(pregunta => !preguntasYaRespondidas.includes(pregunta));
+
+    console.log(`Usuario recurrente '${usuarioActual}'. Enviando ${preguntasPendientes.length} preguntas pendientes.`);
+    res.json(preguntasPendientes);
 });
 
-// Ruta POST para recibir y guardar las respuestas
+// POST /api/preguntas: Añade una nueva pregunta a la lista general.
+app.post('/api/preguntas', (req, res) => {
+    const { nuevaPregunta } = req.body;
+    if (!nuevaPregunta || nuevaPregunta.trim() === '') {
+        return res.status(400).json({ message: 'La pregunta no puede estar vacía.' });
+    }
+    const preguntasActuales = leerDatos(PREGUNTAS_DB_FILE);
+    const preguntaLimpia = nuevaPregunta.trim();
+    preguntasActuales.push(preguntaLimpia);
+    escribirDatos(PREGUNTAS_DB_FILE, preguntasActuales);
+    console.log(`Nueva pregunta añadida: "${preguntaLimpia}"`);
+    res.status(201).json({ message: '¡Pregunta añadida con éxito!' });
+});
+
+
+// --- Ruta para RESPUESTAS ---
+
+// POST /api/respuestas: Guarda las respuestas de un usuario.
+// Esta lógica ahora es más simple, pero la podemos hacer más inteligente después
+// para que actualice en lugar de siempre añadir. Por ahora, funciona.
 app.post('/api/respuestas', (req, res) => {
     const nuevasRespuestas = req.body;
     nuevasRespuestas.id = Date.now();
     nuevasRespuestas.fecha = new Date().toLocaleString("es-MX");
-
-    // Añadimos las nuevas respuestas al array
-    respuestasGuardadas.push(nuevasRespuestas);
     
-    // ¡LA MAGIA! Guardamos el array completo en el archivo
-    escribirDatos(respuestasGuardadas);
+    const respuestasActuales = leerDatos(RESPUESTAS_DB_FILE);
+    respuestasActuales.push(nuevasRespuestas);
+    escribirDatos(RESPUESTAS_DB_FILE, respuestasActuales);
 
-    console.log('--- Nuevas respuestas guardadas en el archivo ---');
-    console.log(JSON.stringify(nuevasRespuestas, null, 2));
-    
+    console.log(`Nuevas respuestas guardadas para el usuario: ${nuevasRespuestas.usuario}`);
     res.status(201).json({ message: 'Respuestas guardadas con éxito!' });
 });
-// ... después de la ruta app.post('/api/respuestas', ...)
 
-// Paleta de colores para asignar a cada usuario
-const colorPalette = ['#ffadad', '#a0c4ff', '#fdffb6', '#caffbf', '#9bf6ff', '#ffc6ff', '#ffd6a5'];
 
-// Ruta GET para obtener y transformar todos los resultados guardados
+// --- Ruta para RESULTADOS ---
+
+// GET /api/resultados: Procesa y devuelve todos los resultados para la visualización.
 app.get('/api/resultados', (req, res) => {
-    const respuestasGuardadas = leerDatos(); // Reutilizamos nuestra función de lectura
+    const respuestasActuales = leerDatos(RESPUESTAS_DB_FILE);
 
-    if (respuestasGuardadas.length === 0) {
-        // Si no hay respuestas, enviamos un objeto vacío
+    if (respuestasActuales.length === 0) {
         return res.json({ preguntas: [], participantes: [] });
     }
 
-    // --- Magia de Transformación de Datos ---
-
-    // 1. Obtenemos una lista única de todas las preguntas
-    const todasLasPreguntas = [...new Set(respuestasGuardadas.flatMap(p => p.respuestas.map(r => r.pregunta)))];
-    
-    // 2. Creamos una lista de participantes únicos con su color asignado
+    const colorPalette = ['#ffadad', '#a0c4ff', '#fdffb6', '#caffbf', '#9bf6ff', '#ffc6ff', '#ffd6a5'];
+    const todasLasPreguntas = [...new Set(respuestasActuales.flatMap(p => p.respuestas.map(r => r.pregunta)))];
     const participantesUnicos = {};
-    respuestasGuardadas.forEach(submission => {
+
+    respuestasActuales.forEach(submission => {
         if (!participantesUnicos[submission.usuario]) {
             participantesUnicos[submission.usuario] = {
                 nombre: submission.usuario,
                 color: colorPalette[Object.keys(participantesUnicos).length % colorPalette.length],
-                respuestas: [] // Array para llenar después
+                respuestas: []
             };
         }
     });
 
-    // 3. Llenamos las respuestas de cada participante para cada pregunta
     todasLasPreguntas.forEach(pregunta => {
         Object.values(participantesUnicos).forEach(participante => {
-            const submissionDelParticipante = respuestasGuardadas.find(s => s.usuario === participante.nombre);
-            const respuestaEncontrada = submissionDelParticipante.respuestas.find(r => r.pregunta === pregunta);
-            
+            const submissionDelParticipante = respuestasActuales.find(s => s.usuario === participante.nombre);
+            const respuestaEncontrada = submissionDelParticipante ? submissionDelParticipante.respuestas.find(r => r.pregunta === pregunta) : null;
             participante.respuestas.push(respuestaEncontrada ? respuestaEncontrada.respuesta : 'No respondió');
         });
     });
-
-    // 4. Preparamos el paquete final para el frontend
-    const payloadFinal = {
+    
+    res.json({
         preguntas: todasLasPreguntas,
         participantes: Object.values(participantesUnicos)
-    };
-    
-    res.json(payloadFinal);
+    });
 });
+
+
 // =================================================================
 // --- INICIO DEL SERVIDOR ---
 // =================================================================
+
 app.listen(PORT, () => {
     console.log(`🚀 Servidor del Chismografo escuchando en http://localhost:${PORT}`);
 });
