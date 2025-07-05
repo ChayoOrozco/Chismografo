@@ -39,31 +39,47 @@ document.addEventListener('DOMContentLoaded', function() {
     linkIrAAdmin.addEventListener('click', mostrarLoginAdmin);
     linkIrAFamiliar.addEventListener('click', mostrarLoginFamiliar);
 
-    // =================================================================
-    // ¡AQUÍ ESTÁ LA NUEVA LÓGICA!
-    // =================================================================
-    loginForm.addEventListener('submit', function(event) {
-        // 1. Prevenimos que el formulario recargue la página. ¡Crucial!
-        event.preventDefault(); 
+// En public/js/script.js
 
-        // 2. Verificamos si el formulario de admin está activo o no
-        const esLoginAdmin = !seccionAdmin.classList.contains('hidden');
+loginForm.addEventListener('submit', async (event) => { // ¡Hacemos la función async!
+    event.preventDefault(); 
+    const esLoginAdmin = !seccionAdmin.classList.contains('hidden');
 
-        if (esLoginAdmin) {
-            // Si es el login de Admin, mostramos nuestro mensaje "próximamente"
-            const adminUser = document.getElementById('adminUser').value;
-            console.log('Intento de login admin para:', adminUser);
-            alert('¡Panel de Administrador Próximamente! Por ahora, esta función está en construcción.');
-        
-        } else {
-            // Si es el login Familiar, ¡hacemos la redirección!
-            const familiaId = document.getElementById('familiaId').value;
-            console.log('Iniciando sesión para la cuenta simulada:', familiaId);
+    if (esLoginAdmin) {
+        // Lógica para el login de ADMIN
+        const adminUser = document.getElementById('adminUser').value;
+        const adminPass = document.getElementById('adminPass').value;
 
-            // 3. ¡La línea mágica que nos lleva a la siguiente página!
-            alert('¡Bienvenido! Cargando el chismografo...');
-            window.location.href = 'preguntas.html';
+        try {
+            const response = await fetch('/api/login/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminUser, adminPass })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                // Si el servidor responde con un error (ej. 401 Unauthorized)
+                throw new Error(result.message);
+            }
+
+            alert(result.message);
+            // ¡Próximamente! Aquí redirigiremos al panel de admin
+            // window.location.href = '/admin.html';
+            console.log("Redirigiendo al panel de admin (en construcción)...");
+
+        } catch (error) {
+            alert(`Error de login: ${error.message}`);
         }
-    });
+    
+    } else {
+        // Lógica para el login Familiar (no cambia por ahora)
+        const familiaId = document.getElementById('familiaId').value;
+        localStorage.setItem('idUsuarioLogueado', familiaId);
+        alert('¡Bienvenido! Cargando el chismografo...');
+        window.location.href = 'preguntas.html';
+    }
+});
 
 });
