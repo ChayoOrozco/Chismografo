@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chismografo - Las Preguntas</title>
+    <link rel="icon" type="image/png" href="img/sticker-smiley.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+
+    <!-- Usamos la misma hoja de estilos -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Contenedor Principal que se centrará en la página -->
+    <div class="main-container">
+        
+        <!-- Área de Preguntas (visible al inicio) -->
+        <div id="question-card">
+            <p class="instructions">Lee la pregunta, escribe tu respuesta y presiona el botón para continuar.</p>
+            <h2 id="question-text">Cargando pregunta...</h2>
+            <textarea id="answer-input" placeholder="Tu respuesta aquí..." rows="8"></textarea>
+            <button id="next-button">Guardar y Siguiente Pregunta</button>
+        </div>
+
+        <!-- Pantalla Final (oculta al inicio) -->
+        <div id="end-screen" class="hidden">
+            <h2>¡Has terminado!</h2>
+            <p>Todas tus respuestas han sido guardadas.</p>
+            <p>¿Qué quieres hacer ahora?</p>
+            <div class="end-buttons">
+                <button id="generate-question-button">Generar Nueva Pregunta</button>
+                <button id="view-results-button">Ver Todas las Respuestas</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Enlazamos el JS para esta página -->
+    <script src="/js/preguntas.js"></script>
+</body>
+</html>

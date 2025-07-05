@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chismografo Familiar</title>
+
+    <!-- ============================================= -->
+    <!-- NUEVO: Ícono para la pestaña (Favicon) -->
+    <!-- ============================================= -->
+    <link rel="icon" type="image/png" href="img/sticker-yin-yang.png">
+    <!-- ============================================= -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="contenedor-principal">
+        <form class="login-etiqueta" id="login-form">
+            
+            <img src="img/sticker-yin-yang.png" alt="Sticker Yin-Yang" class="sticker sticker-1">
+            <img src="img/sticker-smiley.png" alt="Sticker Carita Feliz" class="sticker sticker-2">
+            <img src="img/sticker-star.png" alt="Sticker Estrella" class="sticker sticker-3">
+            
+            <h1 id="titulo-principal">Chismografo Familiar</h1>
+            
+            <!-- SECCIÓN LOGIN FAMILIAR -->
+            <div id="login-familiar">
+                <div class="form-grupo">
+                    <label for="familiaId">ID de Familia:</label>
+                    <input type="text" id="familiaId" name="familiaId">
+                </div>
+                <div class="form-grupo">
+                    <label for="clave">Clave Secreta:</label>
+                    <input type="password" id="clave" name="clave">
+                </div>
+            </div>
+
+            <!-- SECCIÓN LOGIN ADMIN -->
+            <div id="login-admin" class="hidden">
+                <div class="form-grupo">
+                    <label for="adminUser">Usuario Admin:</label>
+                    <input type="text" id="adminUser" name="adminUser">
+                </div>
+                <div class="form-grupo">
+                    <label for="adminPass">Contraseña Admin:</label>
+                    <input type="password" id="adminPass" name="adminPass">
+                </div>
+            </div>
+            
+            <button type="submit" id="boton-submit">¡Entrar!</button>
+
+            <!-- ENLACES PARA CAMBIAR DE MODO -->
+            <div class="switch-links">
+                <a href="#" id="ir-a-admin">Acceso Admin</a>
+                <a href="#" id="ir-a-familiar" class="hidden">« Volver al login familiar</a>
+            </div>
+        </form>
+    </main>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>
