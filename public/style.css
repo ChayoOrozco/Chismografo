@@ -639,3 +639,20 @@ body {
 .logout-btn-questions:active {
     transform: translateY(0);
 }
+
+/* Header del panel de admin */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2em;
+    padding-bottom: 1em;
+    border-bottom: 2px dashed #eee;
+}
+
+.admin-header h1 {
+    margin: 0;
+    font-family: 'Permanent Marker', cursive;
+    color: #2c7ac9;
+    font-size: 2.5em;
+}
