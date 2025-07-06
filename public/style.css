@@ -7,201 +7,11 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: 'Gochi Hand', cursive; /* Fuente base para todo */
+    font-family: 'Gochi Hand', cursive;
     font-size: 16px;
 }
 
 /* --- El efecto de hoja de libreta en toda la página --- */
-body {
-    background-color: #fef9e7; /* Un color crema, como papel viejo */
-
-    /* Magia para las líneas: usamos dos gradientes como imágenes de fondo */
-    background-image:
-        /* 1. La línea de margen vertical (roja) */
-        linear-gradient(to right, #ffb3b3 2px, transparent 2px),
-        /* 2. Las líneas horizontales (azules) */
-        linear-gradient(#d4e4f7 1px, transparent 1px);
-
-    /* Posicionamos la línea de margen a la izquierda */
-    background-position: 40px 0, 0 0;
-    
-    /* La línea roja solo se repite verticalmente, las azules por toda la hoja */
-    background-repeat: repeat-y, repeat;
-
-    /* Tamaño de las líneas horizontales para que parezca un renglón */
-    background-size: 100% 1.5em;
-}
-
-/* --- Contenedor para centrar la etiqueta de login --- */
-.contenedor-principal {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
-}
-
-/* --- El estilo de la etiqueta de login --- */
-.login-etiqueta {
-    background-color: #ffffff;
-    padding: 2em;
-    border: 2px dashed #aaa; /* Borde punteado como etiqueta recortable */
-    border-radius: 15px;
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2); /* Sombra para que "flote" */
-    width: 90%;
-    max-width: 400px; /* Para que no sea gigante en pantallas grandes */
-    text-align: left;
-}
-
-/* --- Estilo del Título principal (como escrito con plumón) --- */
-.login-etiqueta h1 {
-    font-family: 'Permanent Marker', cursive;
-    color: #2c7ac9; /* Un azul escolar */
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 1.5em;
-    font-size: 2.5em;
-}
-
-/* --- Estilos para los campos del formulario --- */
-.form-grupo {
-    margin-bottom: 1.5em;
-}
-
-.form-grupo label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 1.3em;
-    color: #333;
-}
-
-.form-grupo input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-family: 'Gochi Hand', cursive; /* Hereda la fuente */
-    font-size: 1.2em;
-}
-
-/* --- Estilo del Botón --- */
-button {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 8px;
-    background-color: #5cb85c; /* Un verde amigable */
-    color: white;
-    font-family: 'Permanent Marker', cursive;
-    font-size: 1.5em;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
-    margin-top: 1em;
-}
-
-button:hover {
-    background-color: #4a9d4a; /* Un verde un poco más oscuro al pasar el ratón */
-}
-
-/* ... */
-
-/* --- Estilo del Botón --- */
-button {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 8px;
-    background-color: #5cb85c;
-    color: white;
-    font-family: 'Permanent Marker', cursive;
-    font-size: 1.5em;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
-    margin-top: 1em;
-}
-
-button:hover {
-    background-color: #4a9d4a;
-}
-
-/* ---Estilos para los enlaces de cambio de modo --- */
-.switch-links {
-    text-align: right;
-    margin-top: 1em;
-}
-
-.switch-links a {
-    font-size: 0.9em;
-    color: #666;
-    text-decoration: none;
-}
-
-.switch-links a:hover {
-    text-decoration: underline;
-}
-
-/* ---Clase de utilidad para ocultar elementos --- */
-.hidden {
-    display: none;
-}
-
-/* ... (Todo el CSS anterior hasta el estilo de la etiqueta) ... */
-
-/* --- El estilo de la etiqueta de login --- */
-.login-etiqueta {
-    background-color: #ffffff;
-    padding: 2em;
-    border: 2px dashed #aaa;
-    border-radius: 15px;
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
-    width: 90%;
-    max-width: 400px;
-    text-align: left;
-    position: relative; /* ¡MUY IMPORTANTE! Este es nuestro "lienzo" */
-}
-
-/* --- (El resto del CSS hasta el final sigue igual) ... */
-/* ... */
-
-/* ============================================= */
-/* NUEVO: Estilos para los stickers */
-/* ============================================= */
-.sticker {
-    position: absolute; /* Permite posicionarlos libremente dentro del lienzo */
-    width: 80px; /* Tamaño base del sticker */
-    height: auto;
-    /* Una pequeña sombra que sigue la forma del sticker, no de la caja */
-    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
-}
-
-/* Posición y rotación de cada sticker individual */
-.sticker-1 { /* Yin-Yang */
-    top: -25px; /* 25px hacia arriba desde el borde superior */
-    left: -30px; /* 30px hacia la izquierda desde el borde izquierdo */
-    transform: rotate(-15deg); /* Lo giramos un poco */
-    width: 100px; /* Un poco más pequeño */
-}
-
-.sticker-2 { /* Carita Feliz */
-    bottom: 50px; /* 50px hacia arriba desde el borde inferior */
-    right: -40px; /* 40px hacia la derecha desde el borde derecho */
-    transform: rotate(10deg);
-    width: 100px; /* Un poco más pequeño */
-}
-
-.sticker-3 { /* Estrella */
-    top: 60px; /* 60px hacia abajo desde el borde superior */
-    right: -20px;
-    transform: rotate(25deg);
-    width: 120px;
-}
-/* ======================================================= */
-/* --- ESTILOS PARA LA PÁGINA DE PREGUNTAS (Versión 2) --- */
-/* ======================================================= */
-
-/* Mantenemos el fondo de libreta para toda la página */
 body {
     background-color: #fef9e7;
     background-image:
@@ -210,35 +20,182 @@ body {
     background-position: 40px 0, 0 0;
     background-repeat: repeat-y, repeat;
     background-size: 100% 1.5em;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px 0;
 }
 
-/* Contenedor que simula una ficha o tarjeta */
+/* --- RESPONSIVE: Mobile First Approach --- */
+
+/* === ESTILOS MÓVILES (Base) === */
+.contenedor-principal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 10px;
+}
+
+.login-etiqueta {
+    background-color: #ffffff;
+    padding: 1.5em;
+    border: 2px dashed #aaa;
+    border-radius: 15px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 350px;
+    text-align: left;
+    position: relative;
+    margin: 10px;
+}
+
+.login-etiqueta h1 {
+    font-family: 'Permanent Marker', cursive;
+    color: #2c7ac9;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 1em;
+    font-size: 1.8em;
+    line-height: 1.2;
+}
+
+/* --- Optimización de formularios para móvil --- */
+.form-grupo {
+    margin-bottom: 1.2em;
+}
+
+.form-grupo label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.form-grupo input {
+    width: 100%;
+    padding: 14px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: 'Gochi Hand', cursive;
+    font-size: 1.1em;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* --- Botones optimizados para touch --- */
+button {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: #5cb85c;
+    color: white;
+    font-family: 'Permanent Marker', cursive;
+    font-size: 1.3em;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    margin-top: 1em;
+    min-height: 50px;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+button:hover, button:active {
+    background-color: #4a9d4a;
+}
+
+/* --- Stickers optimizados para móvil --- */
+.sticker {
+    position: absolute;
+    width: 60px;
+    height: auto;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
+    pointer-events: none;
+}
+
+.sticker-1 {
+    top: -20px;
+    left: -25px;
+    transform: rotate(-15deg);
+    width: 70px;
+}
+
+.sticker-2 {
+    bottom: 40px;
+    right: -30px;
+    transform: rotate(10deg);
+    width: 70px;
+}
+
+.sticker-3 {
+    top: 50px;
+    right: -15px;
+    transform: rotate(25deg);
+    width: 80px;
+}
+
+/* --- Enlaces de cambio de modo --- */
+.switch-links {
+    text-align: center;
+    margin-top: 1em;
+}
+
+.switch-links a {
+    font-size: 1em;
+    color: #666;
+    text-decoration: none;
+    padding: 10px;
+    display: inline-block;
+}
+
+.switch-links a:hover {
+    text-decoration: underline;
+}
+
+/* --- Clase de utilidad para ocultar elementos --- */
+.hidden {
+    display: none;
+}
+
+/* ======================================================= */
+/* --- ESTILOS PARA LA PÁGINA DE PREGUNTAS (Mobile First) --- */
+/* ======================================================= */
+
 .main-container {
-    width: 90%;
-    max-width: 800px;
+    width: 95%;
+    max-width: 600px;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 10px;
-    padding: 2em;
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
+    padding: 1.5em;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+    margin: 10px auto;
 }
 
+.main-container h1 {
+    font-family: 'Permanent Marker', cursive;
+    color: #2c7ac9;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 1em;
+    font-size: 1.8em;
+    line-height: 1.2;
+}
 
+.main-container h2 {
+    font-family: 'Permanent Marker', cursive;
+    color: #333;
+    font-size: 1.4em;
+    margin-bottom: 1em;
+    text-align: center;
+    line-height: 1.3;
+    word-wrap: break-word;
+}
 
-/* Sección para la respuesta personal del usuario */
+/* --- Sección de respuesta personal --- */
 .my-response-section {
     background-color: #f8f9fa;
     border: 2px dashed #2c7ac9;
     border-radius: 10px;
-    padding: 1.5em;
-    margin: 2em 0;
+    padding: 1.2em;
+    margin: 1.5em 0;
 }
 
 .my-response-section h3 {
@@ -246,18 +203,21 @@ body {
     color: #2c7ac9;
     margin-top: 0;
     margin-bottom: 1em;
-    font-size: 1.5em;
+    font-size: 1.3em;
 }
 
 .my-response-section textarea {
     width: 100%;
     padding: 12px;
     font-family: 'Gochi Hand', cursive;
-    font-size: 1.2em;
+    font-size: 1.1em;
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-bottom: 1em;
     resize: vertical;
+    min-height: 100px;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .my-response-section button {
@@ -265,11 +225,13 @@ body {
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 12px 20px;
+    padding: 14px 20px;
     font-family: 'Permanent Marker', cursive;
-    font-size: 1.2em;
+    font-size: 1.1em;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    width: 100%;
+    min-height: 50px;
 }
 
 .my-response-section button:hover {
@@ -281,14 +243,14 @@ body {
     cursor: not-allowed;
 }
 
-/* Sección para crear nueva pregunta */
+/* --- Sección para crear nueva pregunta --- */
 .create-question-section {
     background-color: #f0f8ff;
     border: 2px dashed #5cb85c;
     border-radius: 10px;
-    padding: 1.5em;
-    margin: 2em 0;
-    display: none; /* Oculto por defecto */
+    padding: 1.2em;
+    margin: 1.5em 0;
+    display: none;
 }
 
 .create-question-section h3 {
@@ -296,7 +258,7 @@ body {
     color: #5cb85c;
     margin-top: 0;
     margin-bottom: 1em;
-    font-size: 1.5em;
+    font-size: 1.3em;
     text-align: center;
 }
 
@@ -304,12 +266,14 @@ body {
     width: 100%;
     padding: 12px;
     font-family: 'Gochi Hand', cursive;
-    font-size: 1.2em;
+    font-size: 1.1em;
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-bottom: 1em;
     resize: vertical;
     min-height: 80px;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .create-question-section button {
@@ -317,70 +281,73 @@ body {
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 12px 20px;
+    padding: 14px 20px;
     font-family: 'Permanent Marker', cursive;
-    font-size: 1.2em;
+    font-size: 1.1em;
     cursor: pointer;
     transition: background-color 0.2s ease;
     width: 100%;
+    min-height: 50px;
 }
 
 .create-question-section button:hover {
     background-color: #4a9d4a;
 }
 
-/* Pantalla final */
+/* --- Pantalla final --- */
 #end-screen {
     text-align: center;
-    padding: 2em;
+    padding: 1.5em;
 }
 
 #end-screen h2 {
     font-family: 'Permanent Marker', cursive;
     color: #5cb85c;
-    font-size: 2.5em;
+    font-size: 2em;
+    line-height: 1.2;
 }
 
 .end-buttons {
     display: flex;
     flex-direction: column;
     gap: 1em;
-    margin-top: 2em;
+    margin-top: 1.5em;
 }
+
 /* ============================================================== */
-/* --- ESTILOS PARA EL VISOR DE RESULTADOS (Versión 2) --- */
+/* --- ESTILOS PARA EL VISOR DE RESULTADOS (Mobile First) --- */
 /* ============================================================== */
 
 .results-viewer {
-    width: 90%;
-    max-width: 700px;
-    margin: 20px auto;
+    width: 95%;
+    max-width: 600px;
+    margin: 10px auto;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 10px;
-    padding: 2em;
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 1.5em;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 .question-header {
     text-align: center;
-    padding: 1em 0 1em 0;
-    margin-bottom: 2em;
+    padding: 1em 0;
+    margin-bottom: 1.5em;
     border-bottom: 2px dashed #eee;
 }
 
 #current-question {
     font-family: 'Permanent Marker', cursive;
-    font-size: 1.8em;
+    font-size: 1.4em;
     color: #333;
     margin: 0;
     line-height: 1.3;
     word-wrap: break-word;
-    padding: 0 10px;
+    padding: 0 5px;
 }
 
 #question-counter {
-    font-size: 1em;
+    font-size: 0.9em;
     color: #888;
     margin-top: 0.5em;
     margin-bottom: 0;
@@ -399,43 +366,43 @@ body {
 .answer-header {
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 12px;
     border-radius: 5px;
     background-color: #f9f9f9;
     cursor: pointer;
     transition: background-color 0.2s;
+    min-height: 50px;
 }
 
-.answer-header:hover {
+.answer-header:hover, .answer-header:active {
     background-color: #f0f0f0;
 }
 
 .color-swatch {
     width: 20px;
     height: 20px;
-    border-radius: 50%; /* Lo hacemos un círculo */
-    margin-right: 15px;
-    flex-shrink: 0; /* Evita que se encoja */
+    border-radius: 50%;
+    margin-right: 12px;
+    flex-shrink: 0;
 }
 
 .participant-name {
     font-family: 'Permanent Marker', cursive;
-    font-size: 1.2em;
+    font-size: 1.1em;
     color: #555;
 }
 
 .answer-text {
-    /* La respuesta está oculta por defecto */
     display: none;
-    padding: 15px 15px 15px 50px; /* Padding izquierdo para alinear con el nombre */
-    font-size: 1.2em;
+    padding: 15px 15px 15px 45px;
+    font-size: 1.1em;
     color: #333;
     line-height: 1.5;
     border-left: 3px solid #eee;
     margin-top: 5px;
+    word-wrap: break-word;
 }
 
-/* Cuando se revele la respuesta, la mostramos */
 .answer-text.visible {
     display: block;
 }
@@ -443,14 +410,18 @@ body {
 .navigation-footer {
     display: flex;
     justify-content: space-between;
-    margin-top: 2em;
+    margin-top: 1.5em;
     border-top: 2px dashed #eee;
-    padding-top: 1.5em;
+    padding-top: 1.2em;
+    gap: 10px;
 }
 
 .navigation-footer button {
-    padding: 10px 20px;
+    padding: 12px 16px;
     font-family: 'Permanent Marker', cursive;
+    font-size: 1em;
+    flex: 1;
+    min-height: 50px;
 }
 
 .navigation-footer button:disabled {
@@ -458,20 +429,20 @@ body {
     cursor: not-allowed;
 }
 
-/* Estilo de libreta para las respuestas */
+/* --- Estilo de libreta para las respuestas --- */
 .notebook-style {
     background-color: #fff;
-    padding: 2em;
+    padding: 1.5em;
     border-radius: 8px;
     border: 1px solid #ddd;
     position: relative;
-    min-height: 400px;
+    min-height: 300px;
 }
 
 .answer-entry {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 1.2em;
+    margin-bottom: 1em;
     padding: 8px 0;
     border-bottom: 1px dotted #eee;
 }
@@ -479,9 +450,9 @@ body {
 .answer-number {
     font-family: 'Permanent Marker', cursive;
     color: #2c7ac9;
-    font-size: 1.1em;
-    min-width: 30px;
-    margin-right: 15px;
+    font-size: 1em;
+    min-width: 25px;
+    margin-right: 12px;
     font-weight: bold;
 }
 
@@ -491,75 +462,77 @@ body {
 
 .participant-name-inline {
     font-family: 'Permanent Marker', cursive;
-    font-size: 1.1em;
+    font-size: 1em;
     color: #333;
-    margin-right: 10px;
+    margin-right: 8px;
 }
 
 .participant-response {
     font-family: 'Gochi Hand', cursive;
-    font-size: 1.2em;
+    font-size: 1.1em;
     color: #555;
     line-height: 1.4;
     margin: 0;
+    word-wrap: break-word;
 }
 
 .color-indicator {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     display: inline-block;
-    margin-right: 8px;
+    margin-right: 6px;
     border: 1px solid #ddd;
 }
 
-/* Estilo cuando no hay respuestas */
 .no-responses {
     text-align: center;
     color: #999;
     font-style: italic;
-    padding: 3em;
-    font-size: 1.2em;
+    padding: 2em;
+    font-size: 1.1em;
 }
 
-/* Estilo para respuestas vacías */
 .empty-response {
     color: #ccc !important;
     font-style: italic;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
 }
+
 /* ============================================= */
-/* --- ESTILOS PARA EL PANEL DE ADMIN --- */
+/* --- ESTILOS PARA EL PANEL DE ADMIN (Mobile First) --- */
 /* ============================================= */
 
 .admin-panel-container {
-    width: 90%;
-    max-width: 600px;
-    margin: 2em auto;
+    width: 95%;
+    max-width: 500px;
+    margin: 1em auto;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 10px;
-    padding: 2em;
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 1.5em;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
 .admin-panel-container h1 {
     font-family: 'Permanent Marker', cursive;
-    color: #2c7ac9; /* Azul como el login */
-    font-size: 2.5em;
+    color: #2c7ac9;
+    font-size: 2em;
     margin-bottom: 0.2em;
+    line-height: 1.2;
 }
 
 .admin-panel-container p {
     color: #666;
-    margin-bottom: 3em;
+    margin-bottom: 2em;
+    font-size: 0.95em;
 }
 
 .admin-form {
     text-align: left;
     border-top: 2px dashed #eee;
-    padding-top: 2em;
+    padding-top: 1.5em;
 }
 
 .admin-form h2 {
@@ -567,61 +540,64 @@ body {
     color: #555;
     text-align: center;
     margin-top: 0;
-    font-size: 1.8em;
+    font-size: 1.5em;
 }
 
-/* Reutilizamos los estilos del formulario de login */
 .admin-form .form-grupo {
-    margin-bottom: 1.5em;
+    margin-bottom: 1.2em;
 }
+
 .admin-form .form-grupo label {
     display: block;
-    margin-bottom: 8px;
-    font-size: 1.3em;
+    margin-bottom: 6px;
+    font-size: 1.1em;
     color: #333;
 }
+
 .admin-form .form-grupo input {
     width: 100%;
-    padding: 12px;
+    padding: 14px 12px;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-family: 'Gochi Hand', cursive;
-    font-size: 1.2em;
+    font-size: 1.1em;
+    -webkit-appearance: none;
+    appearance: none;
 }
+
 .admin-form button {
-    /* Usamos el color azul para el botón de admin */
     background-color: #2c7ac9;
+    min-height: 50px;
 }
+
 .admin-form button:hover {
     background-color: #2567a9;
 }
 
-/* ============================================= */
-/* --- ESTILOS ADICIONALES PARA EL PANEL DE ADMIN --- */
-/* ============================================= */
-
+/* --- Panel de administración completo --- */
 .admin-panel {
-    width: 90%;
-    max-width: 800px;
-    margin: 2em auto;
+    width: 95%;
+    max-width: 700px;
+    margin: 1em auto;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 10px;
-    padding: 2em;
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 1.5em;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 .admin-panel h1 {
     font-family: 'Permanent Marker', cursive;
     color: #2c7ac9;
-    font-size: 2.5em;
+    font-size: 2em;
     margin-bottom: 0.5em;
     text-align: center;
+    line-height: 1.2;
 }
 
 .admin-section {
-    margin-bottom: 3em;
-    padding: 1.5em;
+    margin-bottom: 2em;
+    padding: 1.2em;
     border: 2px dashed #eee;
     border-radius: 10px;
 }
@@ -631,31 +607,33 @@ body {
     color: #555;
     text-align: center;
     margin-top: 0;
-    font-size: 1.8em;
-    margin-bottom: 1.5em;
+    font-size: 1.4em;
+    margin-bottom: 1.2em;
 }
 
-/* Lista de usuarios */
+/* --- Lista de usuarios optimizada para móvil --- */
 .user-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 15px;
-    margin-bottom: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
     background-color: #f9f9f9;
     border-radius: 8px;
     border-left: 4px solid #2c7ac9;
+    min-height: 60px;
 }
 
 .user-info {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
+    flex: 1;
 }
 
 .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     background-color: #2c7ac9;
     border-radius: 50%;
     display: flex;
@@ -663,31 +641,32 @@ body {
     justify-content: center;
     color: white;
     font-family: 'Permanent Marker', cursive;
-    font-size: 1.2em;
+    font-size: 1.1em;
+    flex-shrink: 0;
 }
 
 .user-details h3 {
     margin: 0;
     font-family: 'Permanent Marker', cursive;
     color: #333;
-    font-size: 1.3em;
+    font-size: 1.1em;
 }
 
 .user-details p {
-    margin: 5px 0 0 0;
+    margin: 2px 0 0 0;
     color: #666;
-    font-size: 0.9em;
+    font-size: 0.85em;
 }
 
-/* Botón de eliminar con X roja */
+/* --- Botón de eliminar optimizado para touch --- */
 .delete-btn {
     background-color: #ff4444;
     color: white;
     border: none;
     border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    font-size: 18px;
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     display: flex;
@@ -695,75 +674,73 @@ body {
     justify-content: center;
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(255, 68, 68, 0.3);
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
-.delete-btn:hover {
+.delete-btn:hover, .delete-btn:active {
     background-color: #cc0000;
-    transform: scale(1.1);
+    transform: scale(1.05);
     box-shadow: 0 4px 8px rgba(255, 68, 68, 0.4);
-}
-
-.delete-btn:active {
-    transform: scale(0.95);
 }
 
 .loading-text {
     text-align: center;
     color: #666;
     font-style: italic;
+    padding: 1em;
 }
 
 .no-users-text {
     text-align: center;
     color: #999;
     font-style: italic;
-    padding: 2em;
+    padding: 1.5em;
 }
 
-/* Header del panel de admin */
+/* --- Header del panel de admin --- */
 .admin-header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    margin-bottom: 2em;
+    margin-bottom: 1.5em;
     padding-bottom: 1em;
     border-bottom: 2px dashed #eee;
+    gap: 1em;
 }
 
 .admin-header h1 {
     margin: 0;
     font-family: 'Permanent Marker', cursive;
     color: #2c7ac9;
-    font-size: 2.5em;
+    font-size: 2em;
+    text-align: center;
 }
 
-/* Botón de cerrar sesión */
+/* --- Botones de cerrar sesión --- */
 .logout-btn {
     background-color: #6c757d;
     color: white;
     border: none;
     border-radius: 25px;
-    padding: 10px 20px;
+    padding: 12px 20px;
     font-family: 'Gochi Hand', cursive;
-    font-size: 1.1em;
+    font-size: 1em;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
     width: auto;
     margin: 0;
+    min-height: 45px;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
-.logout-btn:hover {
+.logout-btn:hover, .logout-btn:active {
     background-color: #5a6268;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(108, 117, 125, 0.4);
 }
 
-.logout-btn:active {
-    transform: translateY(0);
-}
-
-/* Botón de cerrar sesión para páginas de usuarios (flotante) */
 .logout-btn-questions {
     position: fixed;
     top: 10px;
@@ -772,38 +749,251 @@ body {
     color: white;
     border: none;
     border-radius: 20px;
-    padding: 5px 10px;
+    padding: 8px 12px;
     font-family: 'Gochi Hand', cursive;
-    font-size: 0.8em;
+    font-size: 0.85em;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
     z-index: 1000;
+    min-height: 35px;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
-.logout-btn-questions:hover {
+.logout-btn-questions:hover, .logout-btn-questions:active {
     background-color: #5a6268;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.5);
 }
 
-.logout-btn-questions:active {
-    transform: translateY(0);
+/* ============================================= */
+/* === MEDIA QUERIES PARA PANTALLAS GRANDES === */
+/* ============================================= */
+
+/* --- Tablets (768px y más) --- */
+@media screen and (min-width: 768px) {
+    .contenedor-principal {
+        padding: 20px;
+    }
+    
+    .login-etiqueta {
+        padding: 2em;
+        max-width: 400px;
+    }
+    
+    .login-etiqueta h1 {
+        font-size: 2.2em;
+    }
+    
+    .form-grupo label {
+        font-size: 1.2em;
+    }
+    
+    .form-grupo input {
+        font-size: 1.15em;
+    }
+    
+    button {
+        font-size: 1.4em;
+    }
+    
+    .sticker {
+        width: 70px;
+    }
+    
+    .sticker-1 {
+        width: 85px;
+    }
+    
+    .sticker-2 {
+        width: 85px;
+    }
+    
+    .sticker-3 {
+        width: 100px;
+    }
+    
+    .main-container {
+        width: 90%;
+        max-width: 700px;
+        padding: 2em;
+    }
+    
+    .main-container h1 {
+        font-size: 2.2em;
+    }
+    
+    .main-container h2 {
+        font-size: 1.6em;
+    }
+    
+    .results-viewer {
+        width: 90%;
+        max-width: 700px;
+        padding: 2em;
+    }
+    
+    #current-question {
+        font-size: 1.6em;
+    }
+    
+    .admin-panel-container {
+        max-width: 600px;
+        padding: 2em;
+    }
+    
+    .admin-panel {
+        max-width: 800px;
+        padding: 2em;
+    }
+    
+    .admin-header {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .navigation-footer {
+        gap: 20px;
+    }
 }
 
-/* Header del panel de admin */
-.admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2em;
-    padding-bottom: 1em;
-    border-bottom: 2px dashed #eee;
+/* --- Desktop (1024px y más) --- */
+@media screen and (min-width: 1024px) {
+    .login-etiqueta h1 {
+        font-size: 2.5em;
+    }
+    
+    .form-grupo label {
+        font-size: 1.3em;
+    }
+    
+    .form-grupo input {
+        font-size: 1.2em;
+    }
+    
+    button {
+        font-size: 1.5em;
+    }
+    
+    .sticker {
+        width: 80px;
+    }
+    
+    .sticker-1 {
+        width: 100px;
+    }
+    
+    .sticker-2 {
+        width: 100px;
+    }
+    
+    .sticker-3 {
+        width: 120px;
+    }
+    
+    .main-container h1 {
+        font-size: 2.5em;
+    }
+    
+    .main-container h2 {
+        font-size: 1.8em;
+    }
+    
+    #current-question {
+        font-size: 1.8em;
+    }
+    
+    .admin-panel-container h1 {
+        font-size: 2.5em;
+    }
+    
+    .admin-panel h1 {
+        font-size: 2.5em;
+    }
 }
 
-.admin-header h1 {
-    margin: 0;
-    font-family: 'Permanent Marker', cursive;
-    color: #2c7ac9;
-    font-size: 2.5em;
+/* --- Ajustes especiales para pantallas muy pequeñas --- */
+@media screen and (max-width: 320px) {
+    .contenedor-principal {
+        padding: 5px;
+    }
+    
+    .login-etiqueta {
+        padding: 1.2em;
+        margin: 5px;
+    }
+    
+    .login-etiqueta h1 {
+        font-size: 1.6em;
+    }
+    
+    .sticker {
+        width: 50px;
+    }
+    
+    .sticker-1 {
+        width: 60px;
+        top: -15px;
+        left: -20px;
+    }
+    
+    .sticker-2 {
+        width: 60px;
+        bottom: 30px;
+        right: -25px;
+    }
+    
+    .sticker-3 {
+        width: 65px;
+        top: 40px;
+        right: -10px;
+    }
+}
+
+/* --- Mejoras de accesibilidad y touch --- */
+@media (hover: none) and (pointer: coarse) {
+    /* Estilos específicos para dispositivos touch */
+    .answer-header:hover {
+        background-color: #f9f9f9;
+    }
+    
+    button:hover {
+        background-color: #5cb85c;
+    }
+    
+    .admin-form button:hover {
+        background-color: #2c7ac9;
+    }
+    
+    .logout-btn:hover {
+        background-color: #6c757d;
+        transform: none;
+    }
+    
+    .logout-btn-questions:hover {
+        background-color: #6c757d;
+        transform: none;
+    }
+    
+    .delete-btn:hover {
+        background-color: #ff4444;
+        transform: none;
+    }
+}
+
+/* --- Orientación landscape en móviles --- */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .contenedor-principal {
+        align-items: flex-start;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    
+    .login-etiqueta {
+        margin: 5px;
+    }
+    
+    .sticker-1, .sticker-2, .sticker-3 {
+        display: none;
+    }
 }
