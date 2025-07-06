@@ -12,16 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const endScreen = document.getElementById('end-screen');
     const generateButton = document.getElementById('generate-question-button');
     const viewResultsButton = document.getElementById('view-results-button');
-    const logoutBtn = document.getElementById('logout-btn-questions');
-
-    // --- FUNCIONALIDAD DEL BOTÓN DE LOGOUT ---
-    logoutBtn.addEventListener('click', () => {
-        const confirmLogout = confirm('¿Estás seguro de que quieres cerrar sesión?');
-        if (confirmLogout) {
-            localStorage.removeItem('idUsuarioLogueado');
-            window.location.href = '/index.html';
-        }
-    });
 
     // --- DATOS ---
     let todasLasPreguntas = [];

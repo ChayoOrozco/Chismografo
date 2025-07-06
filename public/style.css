@@ -212,7 +212,7 @@ body {
     background-size: 100% 1.5em;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     min-height: 100vh;
     margin: 0;
     padding: 0;
@@ -222,7 +222,6 @@ body {
 .main-container {
     width: 90%;
     max-width: 800px;
-    margin-top: 40px;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 10px;
@@ -306,7 +305,7 @@ body {
 .results-viewer {
     width: 90%;
     max-width: 700px;
-    margin: 60px auto 2em auto; /* Agregamos espacio superior para el botón */
+    margin: 2em auto;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 10px;
