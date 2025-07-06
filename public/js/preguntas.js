@@ -66,6 +66,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- FUNCIÓN PARA MOSTRAR LA PREGUNTA Y TODAS LAS RESPUESTAS ---
     function mostrarPreguntaYRespuestas() {
+        console.log('Ejecutando mostrarPreguntaYRespuestas'); // Debug temporal
+        console.log('todasLasPreguntas:', todasLasPreguntas); // Debug temporal
+        console.log('participantes:', participantes); // Debug temporal
+        
         if (todasLasPreguntas.length === 0) {
             questionText.textContent = "No hay preguntas disponibles.";
             answersContainer.innerHTML = '<div class="no-responses">No hay preguntas creadas aún</div>';
