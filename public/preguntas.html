@@ -17,23 +17,39 @@
 
     <!-- Botón de cerrar sesión -->
     <button id="logout-btn-questions" class="logout-btn-questions" title="Cerrar sesión">
-        ← Volver al Login
+        ← Login
     </button>
 
     <!-- Contenedor Principal que se centrará en la página -->
     <div class="main-container">
         
-        <!-- Área de Preguntas (visible al inicio) -->
-        <div id="question-card">
-            <p class="instructions">Lee la pregunta, escribe tu respuesta y presiona el botón para continuar.</p>
+        <!-- Header con la pregunta actual -->
+        <div class="question-header">
             <h2 id="question-text">Cargando pregunta...</h2>
-            <textarea id="answer-input" placeholder="Tu respuesta aquí..." rows="8"></textarea>
-            <button id="next-button">Guardar y Siguiente Pregunta</button>
+            <p id="question-counter"></p>
         </div>
 
-        <!-- Pantalla Final (oculta al inicio) -->
+        <!-- Área donde se muestran todas las respuestas en formato lista -->
+        <div id="answers-container" class="notebook-style">
+            <!-- Las respuestas se generarán aquí como lista numerada -->
+        </div>
+
+        <!-- Tu área para responder (solo si aún no has respondido) -->
+        <div id="my-response-area" class="my-response-section">
+            <h3>Tu respuesta:</h3>
+            <textarea id="answer-input" placeholder="Escribe tu respuesta aquí..." rows="4"></textarea>
+            <button id="submit-button">Guardar Mi Respuesta</button>
+        </div>
+
+        <!-- Navegación -->
+        <div class="navigation-footer">
+            <button id="prev-button">← Anterior</button>
+            <button id="next-button">Siguiente →</button>
+        </div>
+
+        <!-- Pantalla Final (cuando ya no hay más preguntas por responder) -->
         <div id="end-screen" class="hidden">
-            <h2>¡Has terminado!</h2>
+            <h2>¡Has respondido todas las preguntas!</h2>
             <p>Todas tus respuestas han sido guardadas.</p>
             <p>¿Qué quieres hacer ahora?</p>
             <div class="end-buttons">

@@ -1,9 +1,13 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
     // --- ELEMENTOS DEL DOM ---
-    const questionCard = document.getElementById('question-card');
     const questionText = document.getElementById('question-text');
+    const questionCounter = document.getElementById('question-counter');
+    const answersContainer = document.getElementById('answers-container');
+    const myResponseArea = document.getElementById('my-response-area');
     const answerInput = document.getElementById('answer-input');
+    const submitButton = document.getElementById('submit-button');
+    const prevButton = document.getElementById('prev-button');
     const nextButton = document.getElementById('next-button');
     const endScreen = document.getElementById('end-screen');
     const generateButton = document.getElementById('generate-question-button');
@@ -14,61 +18,197 @@ document.addEventListener('DOMContentLoaded', async () => {
     logoutBtn.addEventListener('click', () => {
         const confirmLogout = confirm('¿Estás seguro de que quieres cerrar sesión?');
         if (confirmLogout) {
-            // Limpiar datos de sesión
             localStorage.removeItem('idUsuarioLogueado');
-            // Redirigir al login
             window.location.href = '/index.html';
         }
     });
 
     // --- DATOS ---
-    let preguntas = [];
-    let respuestas = [];
+    let todasLasPreguntas = [];
+    let participantes = [];
     let preguntaActualIndex = 0;
     const idUsuario = localStorage.getItem('idUsuarioLogueado') || 'usuario_anonimo';
 
-    // --- FUNCIÓN PARA CARGAR PREGUNTAS ---
-    async function cargarPreguntas() {
+    // --- FUNCIÓN PARA CARGAR TODAS LAS PREGUNTAS ---
+    async function cargarTodasLasPreguntas() {
         try {
-            const response = await fetch(`/api/preguntas/${idUsuario}`);
-            if (!response.ok) throw new Error('No se pudo conectar con el servidor.');
-            
-            const data = await response.json();
-            // ¡LÍNEA DE DEFENSA! Nos aseguramos de que preguntas sea siempre un array.
-            preguntas = Array.isArray(data) ? data : [];
-
+            const response = await fetch('/api/admin/preguntas');
+            if (!response.ok) throw new Error('No se pudo cargar las preguntas.');
+            todasLasPreguntas = await response.json();
         } catch (error) {
-            console.error("Error al cargar las preguntas:", error);
-            questionText.textContent = "¡Ups! No pudimos cargar las preguntas.";
-            nextButton.disabled = true;
+            console.error("Error al cargar preguntas:", error);
+            questionText.textContent = "Error al cargar preguntas.";
         }
     }
 
-    // --- FUNCIÓN PARA MOSTRAR PREGUNTA ---
-    function mostrarPregunta() {
-        if (preguntas.length === 0) {
-            questionText.textContent = "¡Estás al día con todas las preguntas!";
-            answerInput.style.display = 'none';
-            nextButton.textContent = 'Ver Resultados';
-            nextButton.onclick = () => { window.location.href = 'resultados.html'; };
+    // --- FUNCIÓN PARA CARGAR TODOS LOS RESULTADOS ---
+    async function cargarResultados() {
+        try {
+            const response = await fetch('/api/resultados');
+            if (!response.ok) throw new Error('No se pudo cargar los resultados.');
+            const data = await response.json();
+            participantes = data.participantes;
+        } catch (error) {
+            console.error("Error al cargar resultados:", error);
+        }
+    }
+
+    // --- FUNCIÓN PARA VERIFICAR SI EL USUARIO YA RESPONDIÓ LA PREGUNTA ACTUAL ---
+    function usuarioYaRespondio() {
+        if (!participantes.length || !todasLasPreguntas.length) return false;
+        
+        const miParticipante = participantes.find(p => p.nombre === idUsuario);
+        if (!miParticipante) return false;
+        
+        const miRespuesta = miParticipante.respuestas[preguntaActualIndex];
+        return miRespuesta && miRespuesta !== 'No respondió' && miRespuesta.trim() !== '';
+    }
+
+    // --- FUNCIÓN PARA MOSTRAR LA PREGUNTA Y TODAS LAS RESPUESTAS ---
+    function mostrarPreguntaYRespuestas() {
+        if (todasLasPreguntas.length === 0) {
+            questionText.textContent = "No hay preguntas disponibles.";
+            answersContainer.innerHTML = '<div class="no-responses">No hay preguntas creadas aún</div>';
+            myResponseArea.style.display = 'none';
+            document.querySelector('.navigation-footer').style.display = 'none';
             return;
         }
-        if (preguntaActualIndex < preguntas.length) {
-            questionText.textContent = preguntas[preguntaActualIndex];
-            answerInput.style.display = 'block';
-            answerInput.value = '';
-            answerInput.focus();
+
+        // Actualizar header
+        questionText.textContent = todasLasPreguntas[preguntaActualIndex];
+        questionCounter.textContent = `Pregunta ${preguntaActualIndex + 1} de ${todasLasPreguntas.length}`;
+        
+        // Mostrar todas las respuestas en formato lista (igual que en resultados)
+        mostrarTodasLasRespuestas();
+        
+        // Mostrar/ocultar área de respuesta personal
+        if (usuarioYaRespondio()) {
+            myResponseArea.style.display = 'none';
         } else {
-            finalizarChismografo();
+            myResponseArea.style.display = 'block';
+            answerInput.value = '';
+        }
+
+        // Actualizar botones de navegación
+        prevButton.disabled = (preguntaActualIndex === 0);
+        nextButton.disabled = (preguntaActualIndex === todasLasPreguntas.length - 1);
+    }
+
+    // --- FUNCIÓN PARA MOSTRAR TODAS LAS RESPUESTAS (IGUAL QUE EN RESULTADOS) ---
+    function mostrarTodasLasRespuestas() {
+        answersContainer.innerHTML = '';
+        
+        if (participantes.length === 0) {
+            answersContainer.innerHTML = '<div class="no-responses">Aún no hay usuarios registrados</div>';
+            return;
+        }
+        
+        // Generar lista con posiciones fijas (cada usuario siempre en el mismo renglón)
+        participantes.forEach((participante, index) => {
+            const numeroRenglon = index + 1;
+            const respuesta = participante.respuestas[preguntaActualIndex];
+            
+            const answerEntry = document.createElement('div');
+            answerEntry.className = 'answer-entry';
+            
+            // Si hay respuesta válida, la mostramos; si no, mostramos una línea vacía
+            const respuestaTexto = (respuesta && respuesta !== 'No respondió' && respuesta.trim() !== '') 
+                ? respuesta 
+                : '___________________________________';
+            
+            answerEntry.innerHTML = `
+                <div class="answer-number">${numeroRenglon}.</div>
+                <div class="answer-content">
+                    <span class="color-indicator" style="background-color: ${participante.color}"></span>
+                    <span class="participant-name-inline">${participante.nombre}:</span>
+                    <p class="participant-response ${!respuesta || respuesta === 'No respondió' || respuesta.trim() === '' ? 'empty-response' : ''}">${respuestaTexto}</p>
+                </div>
+            `;
+            
+            answersContainer.appendChild(answerEntry);
+        });
+    }
+
+    // --- FUNCIÓN PARA GUARDAR LA RESPUESTA DEL USUARIO ---
+    async function guardarRespuesta() {
+        const respuesta = answerInput.value.trim();
+        if (!respuesta) {
+            alert('Por favor escribe una respuesta antes de guardar.');
+            return;
+        }
+
+        try {
+            const payload = {
+                usuario: idUsuario,
+                respuestas: [{
+                    pregunta: todasLasPreguntas[preguntaActualIndex],
+                    respuesta: respuesta
+                }]
+            };
+
+            const response = await fetch('/api/respuestas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error('No se pudo guardar la respuesta.');
+
+            // Recargar datos y actualizar vista
+            await cargarResultados();
+            mostrarPreguntaYRespuestas();
+            
+            alert('¡Respuesta guardada con éxito!');
+
+        } catch (error) {
+            console.error('Error al guardar respuesta:', error);
+            alert('Hubo un problema al guardar tu respuesta.');
         }
     }
-    // (El resto del archivo no necesita cambios)
-    async function finalizarChismografo() { const payload = { usuario: idUsuario, respuestas: respuestas }; try { const response = await fetch('/api/respuestas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) throw new Error('El servidor no pudo guardar las respuestas.'); const result = await response.json(); console.log('Respuesta del servidor:', result.message); } catch (error) { console.error('Error al enviar las respuestas:', error); alert('Hubo un problema al guardar tus respuestas.'); } questionCard.classList.add('hidden'); endScreen.classList.remove('hidden'); }
-    nextButton.addEventListener('click', () => { respuestas.push({ pregunta: preguntas[preguntaActualIndex], respuesta: answerInput.value }); preguntaActualIndex++; mostrarPregunta(); });
-    generateButton.addEventListener('click', async () => { const nuevaPregunta = prompt("Escribe la nueva pregunta:"); if (nuevaPregunta && nuevaPregunta.trim() !== '') { try { const response = await fetch('/api/preguntas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nuevaPregunta: nuevaPregunta.trim() }) }); if (!response.ok) throw new Error('El servidor no pudo guardar la pregunta.'); const result = await response.json(); alert(result.message); alert("Ahora, por favor responde la pregunta que acabas de crear."); window.location.reload(); } catch (error) { console.error('Error al añadir la pregunta:', error); alert('Hubo un problema al guardar tu pregunta.'); } } });
-    viewResultsButton.addEventListener('click', () => { window.location.href = 'resultados.html'; });
+
+    // --- EVENT LISTENERS ---
+    submitButton.addEventListener('click', guardarRespuesta);
+
+    nextButton.addEventListener('click', () => {
+        if (preguntaActualIndex < todasLasPreguntas.length - 1) {
+            preguntaActualIndex++;
+            mostrarPreguntaYRespuestas();
+        }
+    });
+    
+    prevButton.addEventListener('click', () => {
+        if (preguntaActualIndex > 0) {
+            preguntaActualIndex--;
+            mostrarPreguntaYRespuestas();
+        }
+    });
+
+    generateButton.addEventListener('click', async () => {
+        const nuevaPregunta = prompt("Escribe la nueva pregunta:");
+        if (nuevaPregunta && nuevaPregunta.trim() !== '') {
+            try {
+                const response = await fetch('/api/preguntas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nuevaPregunta: nuevaPregunta.trim() })
+                });
+                if (!response.ok) throw new Error('No se pudo guardar la pregunta.');
+                
+                alert('¡Pregunta añadida con éxito!');
+                await cargarTodasLasPreguntas();
+                mostrarPreguntaYRespuestas();
+            } catch (error) {
+                alert('Hubo un problema al guardar tu pregunta.');
+            }
+        }
+    });
+
+    viewResultsButton.addEventListener('click', () => {
+        window.location.href = 'resultados.html';
+    });
 
     // --- INICIO DE LA EJECUCIÓN ---
-    await cargarPreguntas();
-    mostrarPregunta();
+    await cargarTodasLasPreguntas();
+    await cargarResultados();
+    mostrarPreguntaYRespuestas();
 });
