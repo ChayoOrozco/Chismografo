@@ -82,6 +82,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Actualizar botones de navegación
         prevButton.disabled = (preguntaActualIndex === 0);
         nextButton.disabled = (preguntaActualIndex === todasLasPreguntas.length - 1);
+        
+        // Mostrar botón de crear pregunta si estamos en la última pregunta
+        mostrarBotonCrearPregunta();
     }
 
     // --- FUNCIÓN PARA MOSTRAR TODAS LAS RESPUESTAS (IGUAL QUE EN RESULTADOS) ---
@@ -119,13 +122,111 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // --- FUNCIÓN PARA MOSTRAR EL BOTÓN DE CREAR PREGUNTA ---
+    function mostrarBotonCrearPregunta() {
+        let createQuestionArea = document.getElementById('create-question-area');
+        
+        // Si no existe, crear el área
+        if (!createQuestionArea) {
+            createQuestionArea = document.createElement('div');
+            createQuestionArea.id = 'create-question-area';
+            createQuestionArea.className = 'create-question-section';
+            createQuestionArea.innerHTML = `
+                <h3>¿Quieres agregar una nueva pregunta?</h3>
+                <textarea id="new-question-input" placeholder="Escribe tu nueva pregunta aquí..." rows="3"></textarea>
+                <button id="add-question-btn">Agregar Pregunta</button>
+            `;
+            
+            // Insertar antes de la navegación
+            const navigationFooter = document.querySelector('.navigation-footer');
+            navigationFooter.parentNode.insertBefore(createQuestionArea, navigationFooter);
+            
+            // Agregar event listener
+            document.getElementById('add-question-btn').addEventListener('click', crearNuevaPregunta);
+        }
+        
+        // Mostrar solo si estamos en la última pregunta
+        if (preguntaActualIndex === todasLasPreguntas.length - 1) {
+            createQuestionArea.style.display = 'block';
+        } else {
+            createQuestionArea.style.display = 'none';
+        }
+    }
+
+    // --- FUNCIÓN PARA CREAR NUEVA PREGUNTA ---
+    async function crearNuevaPregunta() {
+        const nuevaPreguntaInput = document.getElementById('new-question-input');
+        const nuevaPregunta = nuevaPreguntaInput.value.trim();
+        const addButton = document.getElementById('add-question-btn');
+        
+        if (!nuevaPregunta) {
+            // Feedback visual en lugar de alert
+            nuevaPreguntaInput.style.borderColor = '#ff4444';
+            nuevaPreguntaInput.placeholder = 'Por favor escribe una pregunta...';
+            setTimeout(() => {
+                nuevaPreguntaInput.style.borderColor = '#ccc';
+                nuevaPreguntaInput.placeholder = 'Escribe tu nueva pregunta aquí...';
+            }, 2000);
+            return;
+        }
+        
+        // Feedback visual de carga
+        addButton.textContent = 'Guardando...';
+        addButton.disabled = true;
+        
+        try {
+            const response = await fetch('/api/preguntas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nuevaPregunta: nuevaPregunta })
+            });
+            
+            if (!response.ok) throw new Error('No se pudo guardar la pregunta.');
+            
+            // Feedback de éxito
+            addButton.textContent = '¡Pregunta agregada!';
+            addButton.style.backgroundColor = '#4a9d4a';
+            nuevaPreguntaInput.value = '';
+            
+            // Recargar preguntas y navegar a la nueva pregunta
+            await cargarTodasLasPreguntas();
+            preguntaActualIndex = todasLasPreguntas.length - 1;
+            await cargarResultados();
+            mostrarPreguntaYRespuestas();
+            
+        } catch (error) {
+            // Feedback de error
+            addButton.textContent = 'Error - Reintentar';
+            addButton.style.backgroundColor = '#ff4444';
+        }
+        
+        // Restaurar botón después de 2 segundos
+        setTimeout(() => {
+            addButton.textContent = 'Agregar Pregunta';
+            addButton.style.backgroundColor = '#5cb85c';
+            addButton.disabled = false;
+        }, 2000);
+    }
+
     // --- FUNCIÓN PARA GUARDAR LA RESPUESTA DEL USUARIO ---
     async function guardarRespuesta() {
         const respuesta = answerInput.value.trim();
+        const submitBtn = document.getElementById('submit-button');
+        
         if (!respuesta) {
-            alert('Por favor escribe una respuesta antes de guardar.');
+            // Feedback visual para campo vacío
+            answerInput.style.borderColor = '#ff4444';
+            answerInput.placeholder = 'Por favor escribe una respuesta...';
+            setTimeout(() => {
+                answerInput.style.borderColor = '#ccc';
+                answerInput.placeholder = 'Escribe tu respuesta aquí...';
+            }, 2000);
             return;
         }
+
+        // Feedback visual de carga
+        submitBtn.textContent = 'Guardando...';
+        submitBtn.disabled = true;
 
         try {
             const payload = {
@@ -144,15 +245,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (!response.ok) throw new Error('No se pudo guardar la respuesta.');
 
+            // Feedback de éxito y actualizar vista
+            submitBtn.textContent = '¡Guardado!';
+            submitBtn.style.backgroundColor = '#4a9d4a';
+            
             // Recargar datos y actualizar vista
             await cargarResultados();
             mostrarPreguntaYRespuestas();
             
-            alert('¡Respuesta guardada con éxito!');
+            // Restaurar botón
+            setTimeout(() => {
+                submitBtn.textContent = 'Guardar Mi Respuesta';
+                submitBtn.style.backgroundColor = '#2c7ac9';
+                submitBtn.disabled = false;
+            }, 1500);
 
         } catch (error) {
-            console.error('Error al guardar respuesta:', error);
-            alert('Hubo un problema al guardar tu respuesta.');
+            // Feedback de error
+            submitBtn.textContent = 'Error - Reintentar';
+            submitBtn.style.backgroundColor = '#ff4444';
+            
+            setTimeout(() => {
+                submitBtn.textContent = 'Guardar Mi Respuesta';
+                submitBtn.style.backgroundColor = '#2c7ac9';
+                submitBtn.disabled = false;
+            }, 2000);
         }
     }
 
@@ -174,23 +291,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     generateButton.addEventListener('click', async () => {
-        const nuevaPregunta = prompt("Escribe la nueva pregunta:");
-        if (nuevaPregunta && nuevaPregunta.trim() !== '') {
-            try {
-                const response = await fetch('/api/preguntas', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nuevaPregunta: nuevaPregunta.trim() })
-                });
-                if (!response.ok) throw new Error('No se pudo guardar la pregunta.');
-                
-                alert('¡Pregunta añadida con éxito!');
-                await cargarTodasLasPreguntas();
-                mostrarPreguntaYRespuestas();
-            } catch (error) {
-                alert('Hubo un problema al guardar tu pregunta.');
-            }
-        }
+        // Redirigir a la última pregunta donde está el botón integrado
+        preguntaActualIndex = todasLasPreguntas.length - 1;
+        mostrarPreguntaYRespuestas();
     });
 
     viewResultsButton.addEventListener('click', () => {

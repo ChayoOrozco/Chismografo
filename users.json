@@ -4,11 +4,5 @@
     "passwordHash": "$2b$10$EcUGub7XunYxoOftvwxpjOgfGavzMXwGBwa8FGGx7ckv.E9SHjiiW",
     "role": "admin"
   },
-  "users": [
-    {
-      "username": "chayo",
-      "passwordHash": "$2b$10$NmiuxcZ/Sf/eiD80GoViV.BrvEeMRwnAty42aETRQTzjnYLT4wIyq",
-      "role": "user"
-    }
-  ]
+  "users": []
 }

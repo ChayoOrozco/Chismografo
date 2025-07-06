@@ -4,7 +4,7 @@ const express = require('express');
 const fs = require('fs');
 const bcrypt = require('bcrypt');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.static('public'));
 app.use(express.json());
@@ -45,7 +45,46 @@ app.get('/api/preguntas/:usuario', (req, res) => { const todasLasPreguntas = lee
 app.post('/api/preguntas', (req, res) => { const { nuevaPregunta } = req.body; if (!nuevaPregunta || nuevaPregunta.trim() === '') return res.status(400).json({ message: 'La pregunta no puede estar vacía.' }); let preguntas = leerDatos(PREGUNTAS_DB_FILE); preguntas.push(nuevaPregunta.trim()); escribirDatos(PREGUNTAS_DB_FILE, preguntas); res.status(201).json({ message: '¡Pregunta añadida con éxito!' }); });
 app.delete('/api/questions', (req, res) => { const { questionToDelete } = req.body; let preguntas = leerDatos(PREGUNTAS_DB_FILE); const initialLength = preguntas.length; preguntas = preguntas.filter(q => q !== questionToDelete); if (preguntas.length === initialLength) return res.status(404).json({ message: 'Pregunta no encontrada.' }); escribirDatos(PREGUNTAS_DB_FILE, preguntas); res.status(200).json({ message: 'Pregunta eliminada.' }); });
 app.post('/api/respuestas', (req, res) => { const nuevasRespuestas = req.body; nuevasRespuestas.id = Date.now(); nuevasRespuestas.fecha = new Date().toLocaleString("es-MX"); let respuestas = leerDatos(RESPUESTAS_DB_FILE); respuestas.push(nuevasRespuestas); escribirDatos(RESPUESTAS_DB_FILE, respuestas); res.status(201).json({ message: 'Respuestas guardadas con éxito!' }); });
-app.get('/api/resultados', (req, res) => { const respuestasActuales = leerDatos(RESPUESTAS_DB_FILE); if (respuestasActuales.length === 0) return res.json({ preguntas: [], participantes: [] }); const usersDB = leerDatos(USERS_DB_FILE, 'object'); const usuariosOrdenados = usersDB.users || []; const colorPalette = ['#ffadad', '#a0c4ff', '#fdffb6', '#caffbf', '#9bf6ff', '#ffc6ff', '#ffd6a5']; const todasLasPreguntas = [...new Set(respuestasActuales.flatMap(p => p.respuestas.map(r => r.pregunta)))]; const participantesOrdenados = usuariosOrdenados.map((user, index) => ({ nombre: user.username, color: colorPalette[index % colorPalette.length], respuestas: [] })); todasLasPreguntas.forEach(pregunta => { participantesOrdenados.forEach(participante => { const submissionDelParticipante = respuestasActuales.find(s => s.usuario === participante.nombre); const respuestaEncontrada = submissionDelParticipante ? submissionDelParticipante.respuestas.find(r => r.pregunta === pregunta) : null; participante.respuestas.push(respuestaEncontrada ? respuestaEncontrada.respuesta : 'No respondió'); }); }); res.json({ preguntas: todasLasPreguntas, participantes: participantesOrdenados }); });
+app.get('/api/resultados', (req, res) => { 
+    const respuestasActuales = leerDatos(RESPUESTAS_DB_FILE); 
+    if (respuestasActuales.length === 0) return res.json({ preguntas: [], participantes: [] }); 
+    
+    const usersDB = leerDatos(USERS_DB_FILE, 'object'); 
+    const usuariosOrdenados = usersDB.users || []; 
+    const colorPalette = ['#ffadad', '#a0c4ff', '#fdffb6', '#caffbf', '#9bf6ff', '#ffc6ff', '#ffd6a5']; 
+    
+    // Obtener todas las preguntas únicas
+    const todasLasPreguntas = [...new Set(respuestasActuales.flatMap(p => p.respuestas.map(r => r.pregunta)))];
+    
+    // Crear participantes con respuestas consolidadas
+    const participantesOrdenados = usuariosOrdenados.map((user, index) => {
+        const participante = {
+            nombre: user.username,
+            color: colorPalette[index % colorPalette.length],
+            respuestas: []
+        };
+        
+        // Para cada pregunta, buscar la última respuesta del usuario
+        todasLasPreguntas.forEach(pregunta => {
+            // Buscar todas las respuestas de este usuario para esta pregunta
+            const respuestasDelUsuario = respuestasActuales
+                .filter(s => s.usuario === user.username)
+                .map(s => s.respuestas.find(r => r.pregunta === pregunta))
+                .filter(r => r !== undefined);
+            
+            // Tomar la última respuesta (más reciente)
+            const ultimaRespuesta = respuestasDelUsuario.length > 0 
+                ? respuestasDelUsuario[respuestasDelUsuario.length - 1].respuesta 
+                : 'No respondió';
+            
+            participante.respuestas.push(ultimaRespuesta);
+        });
+        
+        return participante;
+    });
+    
+    res.json({ preguntas: todasLasPreguntas, participantes: participantesOrdenados }); 
+});
 
 // --- INICIO DEL SERVIDOR ---
 app.listen(PORT, () => console.log(`🚀 Servidor del Chismografo escuchando en http://localhost:${PORT}`));

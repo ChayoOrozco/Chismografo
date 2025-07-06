@@ -64,6 +64,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!confirmacion) return;
 
+        // Feedback visual en el botón
+        const deleteBtn = document.querySelector(`[onclick="eliminarUsuario('${username}')"]`);
+        const originalText = deleteBtn.innerHTML;
+        deleteBtn.innerHTML = '⚙️';
+        deleteBtn.disabled = true;
+
         try {
             const response = await fetch(`/api/users/${username}`, {
                 method: 'DELETE'
@@ -75,26 +81,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(result.message);
             }
 
-            alert(result.message);
-            // Recargar la lista de usuarios
+            // Feedback de éxito - recargar lista
             await cargarListaUsuarios();
 
         } catch (error) {
-            alert(`Error al eliminar la cuenta: ${error.message}`);
+            // Feedback de error
+            deleteBtn.innerHTML = '❌';
+            setTimeout(() => {
+                deleteBtn.innerHTML = originalText;
+                deleteBtn.disabled = false;
+            }, 2000);
         }
     };
 
-    // 6. Listener para crear nuevo usuario (sin cambios)
+    // 6. Listener para crear nuevo usuario
     createUserForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         const username = newUsernameInput.value;
         const password = newPasswordInput.value;
+        const submitBtn = createUserForm.querySelector('button[type="submit"]');
 
         if (!username.trim() || !password.trim()) {
-            alert('Por favor, completa todos los campos.');
+            // Feedback visual para campos vacíos
+            if (!username.trim()) {
+                newUsernameInput.style.borderColor = '#ff4444';
+                setTimeout(() => newUsernameInput.style.borderColor = '#ccc', 2000);
+            }
+            if (!password.trim()) {
+                newPasswordInput.style.borderColor = '#ff4444';
+                setTimeout(() => newPasswordInput.style.borderColor = '#ccc', 2000);
+            }
             return;
         }
+
+        // Feedback visual de carga
+        submitBtn.textContent = 'Creando...';
+        submitBtn.disabled = true;
 
         try {
             const response = await fetch('/api/users', {
@@ -111,16 +134,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(result.message);
             }
 
-            alert(result.message);
+            // Feedback de éxito
+            submitBtn.textContent = '¡Cuenta creada!';
+            submitBtn.style.backgroundColor = '#4a9d4a';
             createUserForm.reset();
             newUsernameInput.focus();
             
             // Recargar la lista de usuarios después de crear uno nuevo
             await cargarListaUsuarios();
-
+            
         } catch (error) {
-            alert(`Error al crear la cuenta: ${error.message}`);
+            // Feedback de error
+            submitBtn.textContent = 'Error - Reintentar';
+            submitBtn.style.backgroundColor = '#ff4444';
         }
+        
+        // Restaurar botón
+        setTimeout(() => {
+            submitBtn.textContent = 'Crear Cuenta';
+            submitBtn.style.backgroundColor = '#2c7ac9';
+            submitBtn.disabled = false;
+        }, 2000);
     });
 
     // 7. Cargar la lista de usuarios al inicio
