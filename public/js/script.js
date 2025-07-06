@@ -1,19 +1,14 @@
-// Espera a que todo el contenido del DOM se cargue antes de ejecutar cualquier código.
 document.addEventListener('DOMContentLoaded', function() {
 
     // --- SELECCIÓN DE ELEMENTOS DEL DOM ---
-    // ¡AQUÍ ESTÁ LA PARTE IMPORTANTE!
     // Nos aseguramos de que TODAS las variables estén declaradas aquí.
     const loginForm = document.getElementById('login-form');
-    
     const tituloPrincipal = document.getElementById('titulo-principal');
     const botonSubmit = document.getElementById('boton-submit');
-
     const seccionFamiliar = document.getElementById('login-familiar');
     const seccionAdmin = document.getElementById('login-admin');
-
-    const linkIrAAdmin = document.getElementById('ir-a-admin'); // La variable que causaba el error
-    const linkIrAFamiliar = document.getElementById('ir-a-familiar');
+    const linkIrAAdmin = document.getElementById('ir-a-admin'); // Variable para el enlace
+    const linkIrAFamiliar = document.getElementById('ir-a-familiar'); // Variable para el otro enlace
 
     // --- FUNCIONES PARA CAMBIAR ENTRE MODOS DE LOGIN ---
     function mostrarLoginAdmin(event) {
@@ -36,7 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
         botonSubmit.textContent = '¡Entrar!';
     }
     
-    // Asignamos las funciones a los eventos 'click' de los enlaces.
+    // --- ASIGNACIÓN DE EVENTOS ---
+    // ¡Esta es la parte que probablemente se rompió!
+    // Nos aseguramos de que ambos listeners estén aquí.
     linkIrAAdmin.addEventListener('click', mostrarLoginAdmin);
     linkIrAFamiliar.addEventListener('click', mostrarLoginFamiliar);
 

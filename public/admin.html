@@ -10,7 +10,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
 
-    <!-- Enlazamos la misma hoja de estilos que usan las otras páginas -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -33,11 +32,15 @@
             </form>
         </div>
 
-        <!-- Próximamente: más secciones como "Ver todas las respuestas", etc. -->
+        <div class="admin-section">
+            <h2>Cuentas Familiares Existentes</h2>
+            <div id="users-list">
+                <p class="loading-text">Cargando cuentas...</p>
+            </div>
+        </div>
 
     </div>
 
-    <!-- Enlazamos un nuevo archivo JS específico para este panel -->
     <script src="js/admin.js"></script>
 </body>
 </html>

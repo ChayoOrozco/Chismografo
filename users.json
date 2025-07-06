@@ -6,13 +6,8 @@
   },
   "users": [
     {
-      "username": "FamiliaPerez",
-      "passwordHash": "$2b$10$unhashdeejemploparafamiliaperez",
-      "role": "user"
-    },
-    {
-      "username": "test",
-      "passwordHash": "$2b$10$rVWrBUPT4OtKvYBLIB6akO.M3vsfekMd5hCKTNq4b2dxbkNRyco.u",
+      "username": "chayo",
+      "passwordHash": "$2b$10$NmiuxcZ/Sf/eiD80GoViV.BrvEeMRwnAty42aETRQTzjnYLT4wIyq",
       "role": "user"
     }
   ]
