@@ -220,6 +220,7 @@ body {
 .main-container {
     width: 90%;
     max-width: 600px;
+    margin-top: 60px; /* Espacio para el botón de logout */
 }
 
 #question-card, #end-screen {
@@ -278,7 +279,7 @@ body {
 .results-viewer {
     width: 90%;
     max-width: 700px;
-    margin: 2em auto;
+    margin: 60px auto 2em auto; /* Agregamos espacio superior para el botón */
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 10px;
@@ -616,14 +617,14 @@ body {
 .logout-btn-questions {
     position: fixed;
     top: 20px;
-    right: 20px;
+    left: 20px;
     background-color: #6c757d;
     color: white;
     border: none;
     border-radius: 25px;
-    padding: 10px 15px;
+    padding: 8px 12px;
     font-family: 'Gochi Hand', cursive;
-    font-size: 1em;
+    font-size: 0.9em;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 2px 6px rgba(108, 117, 125, 0.4);
