@@ -5,8 +5,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const newUsernameInput = document.getElementById('new-username');
     const newPasswordInput = document.getElementById('new-password');
     const usersListContainer = document.getElementById('users-list');
+    const logoutBtn = document.getElementById('logout-btn');
 
-    // 2. Función para cargar y mostrar la lista de usuarios
+    // 2. Event listener para el botón de cerrar sesión
+    logoutBtn.addEventListener('click', () => {
+        const confirmLogout = confirm('¿Estás seguro de que quieres cerrar sesión?');
+        if (confirmLogout) {
+            // Redirigir al login principal
+            window.location.href = '/index.html';
+        }
+    });
+
+    // 3. Función para cargar y mostrar la lista de usuarios
     async function cargarListaUsuarios() {
         try {
             const response = await fetch('/api/users');
@@ -20,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 3. Función para mostrar la lista de usuarios en el DOM
+    // 4. Función para mostrar la lista de usuarios en el DOM
     function mostrarListaUsuarios(users) {
         if (!users || users.length === 0) {
             usersListContainer.innerHTML = '<p class="no-users-text">No hay cuentas familiares creadas aún.</p>';
@@ -48,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         usersListContainer.innerHTML = usersList;
     }
 
-    // 4. Función para eliminar usuario
+    // 5. Función para eliminar usuario
     window.eliminarUsuario = async function(username) {
         const confirmacion = confirm(`¿Estás seguro de que quieres eliminar la cuenta "${username}"? Esta acción no se puede deshacer.`);
         
@@ -74,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // 5. Listener para crear nuevo usuario (sin cambios)
+    // 6. Listener para crear nuevo usuario (sin cambios)
     createUserForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
@@ -113,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 6. Cargar la lista de usuarios al inicio
+    // 7. Cargar la lista de usuarios al inicio
     cargarListaUsuarios();
 
 });

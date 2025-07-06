@@ -11,6 +11,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const answersList = document.getElementById('answers-list');
     const prevButton = document.getElementById('prev-button');
     const nextButton = document.getElementById('next-button');
+    const logoutBtn = document.getElementById('logout-btn-results');
+
+    // --- FUNCIONALIDAD DEL BOTÓN DE LOGOUT ---
+    logoutBtn.addEventListener('click', () => {
+        const confirmLogout = confirm('¿Estás seguro de que quieres cerrar sesión?');
+        if (confirmLogout) {
+            // Limpiar datos de sesión
+            localStorage.removeItem('idUsuarioLogueado');
+            // Redirigir al login
+            window.location.href = '/index.html';
+        }
+    });
 
     // --- FUNCIÓN PARA CARGAR LOS RESULTADOS DESDE LA API ---
     async function cargarResultados() {

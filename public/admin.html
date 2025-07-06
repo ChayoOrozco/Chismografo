@@ -3,21 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Chismografo Familiar</title>
+    <title>Panel de Administración - Chismografo</title>
     <link rel="icon" type="image/png" href="img/sticker-smiley.png">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="admin-panel">
+    <!-- El contenedor principal que recibe los estilos de tarjeta blanca -->
+    <div class="admin-panel"> 
         <h1>Panel de Administración</h1>
         
-        <div class="admin-section">
+        <!-- ======================================================= -->
+        <!-- SECCIÓN PARA CREAR USUARIOS (Esta parte la tenías bien) -->
+        <!-- ======================================================= -->
+        <div class="admin-section"> 
             <h2>Crear Nueva Cuenta Familiar</h2>
             <form id="create-user-form">
                 <div class="form-grupo">
@@ -32,14 +35,29 @@
             </form>
         </div>
 
-        <div class="admin-section">
-            <h2>Cuentas Familiares Existentes</h2>
-            <div id="users-list">
-                <p class="loading-text">Cargando cuentas...</p>
-            </div>
+        <!-- ======================================================= -->
+        <!-- ¡ESTA SECCIÓN FALTABA POR COMPLETO! -->
+        <!-- ======================================================= -->
+        <div class="admin-section"> 
+            <h2>Gestionar Cuentas Familiares</h2>
+            <!-- El 'ul' donde JavaScript insertará la lista de usuarios -->
+            <ul id="user-list" class="management-list">
+                <!-- La lista de usuarios se generará aquí -->
+            </ul>
         </div>
 
-    </div>
+        <!-- ======================================================= -->
+        <!-- ¡Y ESTA SECCIÓN TAMBIÉN FALTABA! -->
+        <!-- ======================================================= -->
+        <div class="admin-section"> 
+            <h2>Gestionar Preguntas</h2>
+            <!-- El 'ul' donde JavaScript insertará la lista de preguntas -->
+            <ul id="question-list" class="management-list">
+                <!-- La lista de preguntas se generará aquí -->
+            </ul>
+        </div>
+
+    </div> <!-- Cierre del div .admin-panel -->
 
     <script src="js/admin.js"></script>
 </body>

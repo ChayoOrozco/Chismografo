@@ -568,3 +568,74 @@ body {
     font-style: italic;
     padding: 2em;
 }
+
+/* Header del panel de admin */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2em;
+    padding-bottom: 1em;
+    border-bottom: 2px dashed #eee;
+}
+
+.admin-header h1 {
+    margin: 0;
+    font-family: 'Permanent Marker', cursive;
+    color: #2c7ac9;
+    font-size: 2.5em;
+}
+
+/* Botón de cerrar sesión */
+.logout-btn {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-family: 'Gochi Hand', cursive;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
+    width: auto;
+    margin: 0;
+}
+
+.logout-btn:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.4);
+}
+
+.logout-btn:active {
+    transform: translateY(0);
+}
+
+/* Botón de cerrar sesión para páginas de usuarios (flotante) */
+.logout-btn-questions {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 15px;
+    font-family: 'Gochi Hand', cursive;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(108, 117, 125, 0.4);
+    z-index: 1000;
+}
+
+.logout-btn-questions:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.5);
+}
+
+.logout-btn-questions:active {
+    transform: translateY(0);
+}
