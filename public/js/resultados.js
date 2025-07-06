@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- ELEMENTOS DEL DOM ---
     const questionText = document.getElementById('current-question');
     const questionCounter = document.getElementById('question-counter');
-    const answersList = document.getElementById('answers-list');
+    const answersContainer = document.getElementById('answers-container');
     const prevButton = document.getElementById('prev-button');
     const nextButton = document.getElementById('next-button');
     const logoutBtn = document.getElementById('logout-btn-results');
@@ -42,54 +42,66 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // --- FUNCIÓN PARA RENDERIZAR (CASI IGUAL QUE ANTES) ---
+    // --- FUNCIÓN PARA RENDERIZAR EN FORMATO LISTA CON POSICIONES FIJAS ---
     function mostrarPreguntaYRespuestas() {
         if (preguntas.length === 0) {
             questionText.textContent = "Aún no hay respuestas guardadas.";
+            answersContainer.innerHTML = '<div class="no-responses">No hay respuestas disponibles</div>';
             document.querySelector('.navigation-footer').style.display = 'none';
             return;
         }
 
+        // Actualizar header
         questionText.textContent = preguntas[preguntaActualIndex];
         questionCounter.textContent = `Pregunta ${preguntaActualIndex + 1} de ${preguntas.length}`;
-        answersList.innerHTML = '';
-
-        participantes.forEach(participante => {
-            const respuesta = participante.respuestas[preguntaActualIndex] || 'No respondió';
-            const listItem = document.createElement('li');
-            listItem.className = 'answer-item';
-            const header = document.createElement('div');
-            header.className = 'answer-header';
-            const colorSwatch = document.createElement('div');
-            colorSwatch.className = 'color-swatch';
-            colorSwatch.style.backgroundColor = participante.color;
-            const name = document.createElement('span');
-            name.className = 'participant-name';
-            name.textContent = participante.nombre;
-            const answerP = document.createElement('p');
-            answerP.className = 'answer-text';
-            answerP.textContent = respuesta;
-
-            header.addEventListener('click', () => answerP.classList.toggle('visible'));
+        
+        // Limpiar contenedor
+        answersContainer.innerHTML = '';
+        
+        // Generar lista con posiciones fijas (cada usuario siempre en el mismo renglón)
+        participantes.forEach((participante, index) => {
+            const numeroRenglon = index + 1; // El número de renglón es fijo para cada usuario
+            const respuesta = participante.respuestas[preguntaActualIndex];
             
-            header.appendChild(colorSwatch);
-            header.appendChild(name);
-            listItem.appendChild(header);
-            listItem.appendChild(answerP);
-            answersList.appendChild(listItem);
+            // Mostrar siempre el renglón, aunque esté vacío
+            const answerEntry = document.createElement('div');
+            answerEntry.className = 'answer-entry';
+            
+            // Si hay respuesta válida, la mostramos; si no, mostramos una línea vacía
+            const respuestaTexto = (respuesta && respuesta !== 'No respondió' && respuesta.trim() !== '') 
+                ? respuesta 
+                : '___________________________________'; // Línea vacía como en las libretas
+            
+            answerEntry.innerHTML = `
+                <div class="answer-number">${numeroRenglon}.</div>
+                <div class="answer-content">
+                    <span class="color-indicator" style="background-color: ${participante.color}"></span>
+                    <span class="participant-name-inline">${participante.nombre}:</span>
+                    <p class="participant-response ${!respuesta || respuesta === 'No respondió' || respuesta.trim() === '' ? 'empty-response' : ''}">${respuestaTexto}</p>
+                </div>
+            `;
+            
+            answersContainer.appendChild(answerEntry);
         });
+        
+        // Si no hay participantes
+        if (participantes.length === 0) {
+            answersContainer.innerHTML = '<div class="no-responses">Aún no hay usuarios registrados</div>';
+        }
 
+        // Actualizar botones de navegación
         prevButton.disabled = (preguntaActualIndex === 0);
         nextButton.disabled = (preguntaActualIndex === preguntas.length - 1);
     }
 
-    // --- EVENT LISTENERS PARA NAVEGACIÓN (SIN CAMBIOS) ---
+    // --- EVENT LISTENERS PARA NAVEGACIÓN ---
     nextButton.addEventListener('click', () => {
         if (preguntaActualIndex < preguntas.length - 1) {
             preguntaActualIndex++;
             mostrarPreguntaYRespuestas();
         }
     });
+    
     prevButton.addEventListener('click', () => {
         if (preguntaActualIndex > 0) {
             preguntaActualIndex--;

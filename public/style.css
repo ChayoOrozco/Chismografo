@@ -378,6 +378,77 @@ body {
     background-color: #ccc;
     cursor: not-allowed;
 }
+
+/* Estilo de libreta para las respuestas */
+.notebook-style {
+    background-color: #fff;
+    padding: 2em;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    position: relative;
+    min-height: 400px;
+}
+
+.answer-entry {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.2em;
+    padding: 8px 0;
+    border-bottom: 1px dotted #eee;
+}
+
+.answer-number {
+    font-family: 'Permanent Marker', cursive;
+    color: #2c7ac9;
+    font-size: 1.1em;
+    min-width: 30px;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+.answer-content {
+    flex: 1;
+}
+
+.participant-name-inline {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 1.1em;
+    color: #333;
+    margin-right: 10px;
+}
+
+.participant-response {
+    font-family: 'Gochi Hand', cursive;
+    font-size: 1.2em;
+    color: #555;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.color-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    border: 1px solid #ddd;
+}
+
+/* Estilo cuando no hay respuestas */
+.no-responses {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 3em;
+    font-size: 1.2em;
+}
+
+/* Estilo para respuestas vacías */
+.empty-response {
+    color: #ccc !important;
+    font-style: italic;
+    letter-spacing: 2px;
+}
 /* ============================================= */
 /* --- ESTILOS PARA EL PANEL DE ADMIN --- */
 /* ============================================= */
