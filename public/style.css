@@ -131,6 +131,19 @@ button:hover, button:active {
     width: 80px;
 }
 
+/* --- Login con Google --- */
+.google-login-hint {
+    text-align: center;
+    color: #666;
+    margin-bottom: 1em;
+}
+
+#google-btn {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.5em;
+}
+
 /* --- Enlaces de cambio de modo --- */
 .switch-links {
     text-align: center;

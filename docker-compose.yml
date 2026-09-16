@@ -1,0 +1,27 @@
+services:
+  chismografo:
+    build: .
+    container_name: chismografo
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+    environment:
+      - SESSION_SECRET=${SESSION_SECRET:-change-me-in-production}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - DATA_DIR=/app/data
+      - NODE_ENV=production
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chismografo.entrypoints=https"
+      - "traefik.http.routers.chismografo.rule=Host(`chismografo.uat.argitic.com`)"
+      - "traefik.http.routers.chismografo.tls=true"
+      - "traefik.http.routers.chismografo.tls.certresolver=cloudflare"
+      - "traefik.http.services.chismografo.loadbalancer.server.port=3000"
+      - "traefik.docker.network=web"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true

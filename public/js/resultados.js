@@ -1,4 +1,17 @@
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+
+    // --- GUARD: hay que estar logueado ---
+    const sesion = await fetch('/api/session').then(r => r.json());
+    if (!sesion.loggedIn) {
+        window.location.href = '/index.html';
+        return;
+    }
 
     // --- DATOS (Ahora se cargarán desde el servidor) ---
     let preguntas = [];
@@ -11,6 +24,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const answersContainer = document.getElementById('answers-container');
     const prevButton = document.getElementById('prev-button');
     const nextButton = document.getElementById('next-button');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    logoutBtn.addEventListener('click', async () => {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/index.html';
+    });
 
     // --- FUNCIÓN PARA CARGAR LOS RESULTADOS DESDE LA API ---
     async function cargarResultados() {
@@ -64,8 +83,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="answer-number">${numeroRenglon}.</div>
                 <div class="answer-content">
                     <span class="color-indicator" style="background-color: ${participante.color}"></span>
-                    <span class="participant-name-inline">${participante.nombre}:</span>
-                    <p class="participant-response ${!respuesta || respuesta === 'No respondió' || respuesta.trim() === '' ? 'empty-response' : ''}">${respuestaTexto}</p>
+                    <span class="participant-name-inline">${escapeHtml(participante.nombre)}:</span>
+                    <p class="participant-response ${!respuesta || respuesta === 'No respondió' || respuesta.trim() === '' ? 'empty-response' : ''}">${escapeHtml(respuestaTexto)}</p>
                 </div>
             `;
             

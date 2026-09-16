@@ -1,5 +1,19 @@
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
-    
+
+    // --- GUARD: hay que estar logueado ---
+    const sesion = await fetch('/api/session').then(r => r.json());
+    if (!sesion.loggedIn) {
+        window.location.href = '/index.html';
+        return;
+    }
+    const idUsuario = sesion.name;
+
     // --- ELEMENTOS DEL DOM ---
     const questionText = document.getElementById('question-text');
     const questionCounter = document.getElementById('question-counter');
@@ -12,12 +26,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const endScreen = document.getElementById('end-screen');
     const generateButton = document.getElementById('generate-question-button');
     const viewResultsButton = document.getElementById('view-results-button');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    logoutBtn.addEventListener('click', async () => {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/index.html';
+    });
 
     // --- DATOS ---
     let todasLasPreguntas = [];
     let participantes = [];
     let preguntaActualIndex = 0;
-    const idUsuario = localStorage.getItem('idUsuarioLogueado') || 'usuario_anonimo';
 
     // --- FUNCIÓN PARA CARGAR TODAS LAS PREGUNTAS ---
     async function cargarTodasLasPreguntas() {
@@ -113,11 +132,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="answer-number">${numeroRenglon}.</div>
                 <div class="answer-content">
                     <span class="color-indicator" style="background-color: ${participante.color}"></span>
-                    <span class="participant-name-inline">${participante.nombre}:</span>
-                    <p class="participant-response ${!respuesta || respuesta === 'No respondió' || respuesta.trim() === '' ? 'empty-response' : ''}">${respuestaTexto}</p>
+                    <span class="participant-name-inline">${escapeHtml(participante.nombre)}:</span>
+                    <p class="participant-response ${!respuesta || respuesta === 'No respondió' || respuesta.trim() === '' ? 'empty-response' : ''}">${escapeHtml(respuestaTexto)}</p>
                 </div>
             `;
-            
+
             answersContainer.appendChild(answerEntry);
         });
     }
@@ -230,7 +249,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const payload = {
-                usuario: idUsuario,
                 respuestas: [{
                     pregunta: todasLasPreguntas[preguntaActualIndex],
                     respuesta: respuesta
