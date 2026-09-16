@@ -754,10 +754,31 @@ button:hover, button:active {
     box-shadow: 0 4px 8px rgba(108, 117, 125, 0.4);
 }
 
-.logout-btn-questions {
-    position: fixed;
-    top: 10px;
-    left: 10px;
+/* --- Barra superior de las páginas de preguntas/resultados --- */
+.toolbar-superior {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5em;
+    margin-bottom: 1em;
+}
+
+.toolbar-botones {
+    display: flex;
+    gap: 0.5em;
+}
+
+.grupo-chip {
+    background-color: #eef4fb;
+    color: #2c7ac9;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.logout-btn-small {
     background-color: #6c757d;
     color: white;
     border: none;
@@ -768,15 +789,24 @@ button:hover, button:active {
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
-    z-index: 1000;
     min-height: 35px;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
-.logout-btn-questions:hover, .logout-btn-questions:active {
+.logout-btn-small:hover, .logout-btn-small:active {
     background-color: #5a6268;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(108, 117, 125, 0.5);
+}
+
+.grupo-actual {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75em;
+    color: #666;
+    margin: -0.5em 0 1.5em;
 }
 
 /* ============================================= */
@@ -983,11 +1013,11 @@ button:hover, button:active {
         transform: none;
     }
     
-    .logout-btn-questions:hover {
+    .logout-btn-small:hover {
         background-color: #6c757d;
         transform: none;
     }
-    
+
     .delete-btn:hover {
         background-color: #ff4444;
         transform: none;

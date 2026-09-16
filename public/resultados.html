@@ -14,8 +14,15 @@
 </head>
 <body>
     <div class="results-viewer">
+        <div class="toolbar-superior">
+            <span id="grupo-actual-nombre" class="grupo-chip"></span>
+            <div class="toolbar-botones">
+                <button id="cambiar-grupo-btn" class="logout-btn-small" title="Cambiar de chismógrafo">Cambiar grupo</button>
+                <button id="logout-btn" class="logout-btn-small" title="Cerrar sesión">Salir</button>
+            </div>
+        </div>
+
         <div class="question-header">
-            <button id="logout-btn" class="logout-btn-questions" title="Cerrar sesión">Salir</button>
             <h2 id="current-question">Cargando...</h2>
             <p id="question-counter"></p>
         </div>

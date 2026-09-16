@@ -18,9 +18,17 @@
     <!-- Contenedor Principal que se centrará en la página -->
     <div class="main-container">
         
+        <!-- Barra superior: grupo actual + acciones de cuenta -->
+        <div class="toolbar-superior">
+            <span id="grupo-actual-nombre" class="grupo-chip"></span>
+            <div class="toolbar-botones">
+                <button id="cambiar-grupo-btn" class="logout-btn-small" title="Cambiar de chismógrafo">Cambiar grupo</button>
+                <button id="logout-btn" class="logout-btn-small" title="Cerrar sesión">Salir</button>
+            </div>
+        </div>
+
         <!-- Header con la pregunta actual -->
         <div class="question-header">
-            <button id="logout-btn" class="logout-btn-questions" title="Cerrar sesión">Salir</button>
             <h2 id="question-text">Cargando pregunta...</h2>
             <p id="question-counter"></p>
         </div>
@@ -35,6 +43,13 @@
             <h3>Tu respuesta:</h3>
             <textarea id="answer-input" placeholder="Escribe tu respuesta aquí..." rows="4"></textarea>
             <button id="submit-button">Guardar Mi Respuesta</button>
+        </div>
+
+        <!-- Agregar una pregunta nueva (siempre disponible, no solo al final) -->
+        <div id="create-question-area" class="create-question-section">
+            <h3>¿Quieres agregar una nueva pregunta?</h3>
+            <textarea id="new-question-input" placeholder="Escribe tu nueva pregunta aquí..." rows="3"></textarea>
+            <button id="add-question-btn">Agregar Pregunta</button>
         </div>
 
         <!-- Navegación -->

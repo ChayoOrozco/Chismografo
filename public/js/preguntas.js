@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- GUARD: hay que estar logueado ---
     const sesion = await fetch('/api/session').then(r => r.json());
-    if (!sesion.loggedIn) {
+    if (!sesion.loggedIn || !sesion.grupo) {
         window.location.href = '/index.html';
         return;
     }
@@ -27,11 +27,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     const generateButton = document.getElementById('generate-question-button');
     const viewResultsButton = document.getElementById('view-results-button');
     const logoutBtn = document.getElementById('logout-btn');
+    const cambiarGrupoBtn = document.getElementById('cambiar-grupo-btn');
+    const grupoNombreEl = document.getElementById('grupo-actual-nombre');
+    const newQuestionInput = document.getElementById('new-question-input');
+    const addQuestionBtn = document.getElementById('add-question-btn');
+
+    grupoNombreEl.textContent = sesion.grupo;
 
     logoutBtn.addEventListener('click', async () => {
         await fetch('/api/logout', { method: 'POST' });
         window.location.href = '/index.html';
     });
+
+    cambiarGrupoBtn.addEventListener('click', async () => {
+        const codigo = prompt('¿A cuál chismógrafo te quieres cambiar?', sesion.grupo);
+        if (codigo === null) return;
+        const res = await fetch('/api/grupo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ codigo })
+        });
+        const result = await res.json();
+        if (!res.ok) { alert(result.message); return; }
+        window.location.reload();
+    });
+
+    addQuestionBtn.addEventListener('click', crearNuevaPregunta);
 
     // --- DATOS ---
     let todasLasPreguntas = [];
@@ -101,9 +122,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Actualizar botones de navegación
         prevButton.disabled = (preguntaActualIndex === 0);
         nextButton.disabled = (preguntaActualIndex === todasLasPreguntas.length - 1);
-        
-        // Mostrar botón de crear pregunta si estamos en la última pregunta
-        mostrarBotonCrearPregunta();
     }
 
     // --- FUNCIÓN PARA MOSTRAR TODAS LAS RESPUESTAS (IGUAL QUE EN RESULTADOS) ---
@@ -141,43 +159,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // --- FUNCIÓN PARA MOSTRAR EL BOTÓN DE CREAR PREGUNTA ---
-    function mostrarBotonCrearPregunta() {
-        let createQuestionArea = document.getElementById('create-question-area');
-        
-        // Si no existe, crear el área
-        if (!createQuestionArea) {
-            createQuestionArea = document.createElement('div');
-            createQuestionArea.id = 'create-question-area';
-            createQuestionArea.className = 'create-question-section';
-            createQuestionArea.innerHTML = `
-                <h3>¿Quieres agregar una nueva pregunta?</h3>
-                <textarea id="new-question-input" placeholder="Escribe tu nueva pregunta aquí..." rows="3"></textarea>
-                <button id="add-question-btn">Agregar Pregunta</button>
-            `;
-            
-            // Insertar antes de la navegación
-            const navigationFooter = document.querySelector('.navigation-footer');
-            navigationFooter.parentNode.insertBefore(createQuestionArea, navigationFooter);
-            
-            // Agregar event listener
-            document.getElementById('add-question-btn').addEventListener('click', crearNuevaPregunta);
-        }
-        
-        // Mostrar solo si estamos en la última pregunta
-        if (preguntaActualIndex === todasLasPreguntas.length - 1) {
-            createQuestionArea.style.display = 'block';
-        } else {
-            createQuestionArea.style.display = 'none';
-        }
-    }
-
     // --- FUNCIÓN PARA CREAR NUEVA PREGUNTA ---
     async function crearNuevaPregunta() {
-        const nuevaPreguntaInput = document.getElementById('new-question-input');
+        const nuevaPreguntaInput = newQuestionInput;
         const nuevaPregunta = nuevaPreguntaInput.value.trim();
-        const addButton = document.getElementById('add-question-btn');
-        
+        const addButton = addQuestionBtn;
+
         if (!nuevaPregunta) {
             // Feedback visual en lugar de alert
             nuevaPreguntaInput.style.borderColor = '#ff4444';

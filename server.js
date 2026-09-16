@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 3000;
 const DATA_DIR = process.env.DATA_DIR || './data';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
+const GRUPO_POR_DEFECTO = 'general';
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -51,6 +52,13 @@ function escribirDatos(filePath, data) {
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
 
+// Convierte un texto libre en un código de grupo simple (minúsculas, sin espacios raros)
+function normalizarGrupo(texto) {
+    if (!texto) return null;
+    const limpio = texto.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return limpio ? limpio.slice(0, 40) : null;
+}
+
 // Si no existe cuenta admin, la crea desde ADMIN_PASSWORD (o 'admin' por defecto)
 function asegurarAdmin() {
     const usersDB = leerDatos(USERS_DB_FILE, 'object');
@@ -67,6 +75,28 @@ function asegurarAdmin() {
 }
 asegurarAdmin();
 
+// Las preguntas eran un array plano (una sola "sala"); las migramos a { general: [...] }
+// para poder tener varios chismógrafos separados sin perder lo que ya había.
+function migrarPreguntasSiHaceFalta() {
+    const actual = leerDatos(PREGUNTAS_DB_FILE, 'object');
+    if (Array.isArray(actual)) {
+        escribirDatos(PREGUNTAS_DB_FILE, { [GRUPO_POR_DEFECTO]: actual });
+        console.log('📦 Preguntas migradas al grupo "general".');
+    }
+}
+migrarPreguntasSiHaceFalta();
+
+// Las respuestas viejas no tenían grupo; las que no lo tengan se asumen del grupo "general".
+function migrarRespuestasSiHaceFalta() {
+    const respuestas = leerDatos(RESPUESTAS_DB_FILE);
+    let cambio = false;
+    respuestas.forEach(r => {
+        if (!r.grupo) { r.grupo = GRUPO_POR_DEFECTO; cambio = true; }
+    });
+    if (cambio) escribirDatos(RESPUESTAS_DB_FILE, respuestas);
+}
+migrarRespuestasSiHaceFalta();
+
 // --- MIDDLEWARES DE AUTENTICACIÓN ---
 function requireUser(req, res, next) {
     if (!req.session.user) return res.status(401).json({ message: 'Debes iniciar sesión.' });
@@ -78,6 +108,10 @@ function requireAdmin(req, res, next) {
     }
     next();
 }
+function requireGrupo(req, res, next) {
+    if (!req.session.user.grupo) return res.status(400).json({ message: 'Primero elige a qué chismógrafo quieres entrar.' });
+    next();
+}
 
 // --- CONFIG PÚBLICA PARA EL FRONTEND ---
 app.get('/api/config', (req, res) => {
@@ -87,11 +121,27 @@ app.get('/api/config', (req, res) => {
 // --- SESIÓN ACTUAL ---
 app.get('/api/session', (req, res) => {
     if (!req.session.user) return res.json({ loggedIn: false });
-    res.json({ loggedIn: true, name: req.session.user.name, role: req.session.user.role });
+    res.json({ loggedIn: true, name: req.session.user.name, role: req.session.user.role, grupo: req.session.user.grupo || null });
 });
 
 app.post('/api/logout', (req, res) => {
     req.session.destroy(() => res.status(200).json({ message: 'Sesión cerrada.' }));
+});
+
+// Elegir o cambiar de chismógrafo (grupo). Sirve tanto para amigos como para el admin.
+app.post('/api/grupo', requireUser, (req, res) => {
+    const grupo = normalizarGrupo(req.body.codigo);
+    if (!grupo) return res.status(400).json({ message: 'Escribe un código de grupo válido (ej. amigos, familia-isra).' });
+
+    req.session.user.grupo = grupo;
+
+    const usersDB = leerDatos(USERS_DB_FILE, 'object');
+    const cuenta = req.session.user.role === 'admin'
+        ? usersDB.admin
+        : (usersDB.users || []).find(u => u.username === req.session.user.username);
+    if (cuenta) { cuenta.grupo = grupo; escribirDatos(USERS_DB_FILE, usersDB); }
+
+    res.status(200).json({ grupo });
 });
 
 // --- Rutas de Login y Gestión de Usuarios ---
@@ -105,7 +155,7 @@ app.post('/api/login/admin', (req, res) => {
     bcrypt.compare(adminPass, adminAccount.passwordHash, (err, result) => {
         if (err) return res.status(500).json({ message: "Error interno del servidor." });
         if (!result) return res.status(401).json({ message: 'Usuario o contraseña incorrectos.' });
-        req.session.user = { username: adminAccount.username, name: adminAccount.username, role: 'admin' };
+        req.session.user = { username: adminAccount.username, name: adminAccount.username, role: 'admin', grupo: adminAccount.grupo };
         res.status(200).json({ message: 'Login exitoso.', role: 'admin' });
     });
 });
@@ -126,22 +176,22 @@ app.post('/api/auth/google', async (req, res) => {
         if (!usersDB.users) usersDB.users = [];
         let cuenta = usersDB.users.find(u => u.username === email);
         if (!cuenta) {
-            cuenta = { username: email, displayName: nombre, role: 'user', provider: 'google' };
+            cuenta = { username: email, displayName: nombre, role: 'user', provider: 'google', grupo: null };
             usersDB.users.push(cuenta);
             escribirDatos(USERS_DB_FILE, usersDB);
         }
 
-        req.session.user = { username: cuenta.username, name: cuenta.displayName || nombre, role: 'user' };
-        res.status(200).json({ message: `¡Bienvenido, ${req.session.user.name}!` });
+        req.session.user = { username: cuenta.username, name: cuenta.displayName || nombre, role: 'user', grupo: cuenta.grupo || null };
+        res.status(200).json({ message: `¡Bienvenido, ${req.session.user.name}!`, grupo: req.session.user.grupo });
     } catch (error) {
         console.error('Error verificando token de Google:', error);
         res.status(401).json({ message: 'No se pudo verificar tu cuenta de Google.' });
     }
 });
 
-app.get('/api/users', requireAdmin, (req, res) => {
+app.get('/api/users', requireAdmin, requireGrupo, (req, res) => {
     const usersDB = leerDatos(USERS_DB_FILE, 'object');
-    const users = usersDB.users || [];
+    const users = (usersDB.users || []).filter(u => u.grupo === req.session.user.grupo);
     const usersInfo = users.map(user => ({ username: user.displayName || user.username, role: user.role }));
     res.json(usersInfo);
 });
@@ -156,22 +206,25 @@ app.delete('/api/users/:username', requireAdmin, (req, res) => {
     res.status(200).json({ message: `Usuario ${usernameToDelete} eliminado.` });
 });
 
-// --- Rutas de Preguntas y Resultados ---
-app.get('/api/admin/preguntas', requireUser, (req, res) => {
-    const preguntas = leerDatos(PREGUNTAS_DB_FILE);
-    res.json(preguntas);
+// --- Rutas de Preguntas y Resultados (todo scoped por grupo/chismógrafo) ---
+app.get('/api/admin/preguntas', requireUser, requireGrupo, (req, res) => {
+    const todasLasPreguntas = leerDatos(PREGUNTAS_DB_FILE, 'object');
+    res.json(todasLasPreguntas[req.session.user.grupo] || []);
 });
-app.post('/api/preguntas', requireUser, (req, res) => {
+app.post('/api/preguntas', requireUser, requireGrupo, (req, res) => {
     const { nuevaPregunta } = req.body;
     if (!nuevaPregunta || nuevaPregunta.trim() === '') return res.status(400).json({ message: 'La pregunta no puede estar vacía.' });
-    let preguntas = leerDatos(PREGUNTAS_DB_FILE);
-    preguntas.push(nuevaPregunta.trim());
-    escribirDatos(PREGUNTAS_DB_FILE, preguntas);
+    let todasLasPreguntas = leerDatos(PREGUNTAS_DB_FILE, 'object');
+    const grupo = req.session.user.grupo;
+    if (!todasLasPreguntas[grupo]) todasLasPreguntas[grupo] = [];
+    todasLasPreguntas[grupo].push(nuevaPregunta.trim());
+    escribirDatos(PREGUNTAS_DB_FILE, todasLasPreguntas);
     res.status(201).json({ message: '¡Pregunta añadida con éxito!' });
 });
-app.post('/api/respuestas', requireUser, (req, res) => {
+app.post('/api/respuestas', requireUser, requireGrupo, (req, res) => {
     const nuevasRespuestas = req.body;
     nuevasRespuestas.usuario = req.session.user.name; // ignoramos lo que mande el cliente
+    nuevasRespuestas.grupo = req.session.user.grupo;
     nuevasRespuestas.id = Date.now();
     nuevasRespuestas.fecha = new Date().toLocaleString("es-MX");
     let respuestas = leerDatos(RESPUESTAS_DB_FILE);
@@ -179,8 +232,8 @@ app.post('/api/respuestas', requireUser, (req, res) => {
     escribirDatos(RESPUESTAS_DB_FILE, respuestas);
     res.status(201).json({ message: 'Respuestas guardadas con éxito!' });
 });
-app.get('/api/resultados', requireUser, (req, res) => {
-    const respuestasActuales = leerDatos(RESPUESTAS_DB_FILE);
+app.get('/api/resultados', requireUser, requireGrupo, (req, res) => {
+    const respuestasActuales = leerDatos(RESPUESTAS_DB_FILE).filter(s => s.grupo === req.session.user.grupo);
     if (respuestasActuales.length === 0) return res.json({ preguntas: [], participantes: [] });
 
     const colorPalette = ['#ffadad', '#a0c4ff', '#fdffb6', '#caffbf', '#9bf6ff', '#ffc6ff', '#ffd6a5'];

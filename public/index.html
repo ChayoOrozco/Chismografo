@@ -48,6 +48,18 @@
                 <a href="#" id="ir-a-familiar" class="hidden">« Volver al login con Google</a>
             </div>
         </form>
+
+        <!-- SECCIÓN ELEGIR CHISMÓGRAFO (aparece tras el login con Google) -->
+        <div class="login-etiqueta hidden" id="seleccionar-grupo">
+            <h1>¿A cuál chismógrafo entras?</h1>
+            <p class="google-login-hint">Escribe el código que te compartieron (ej. amigos, familia, familia-isra). Si es nuevo, se crea solo.</p>
+            <div class="form-grupo">
+                <label for="grupo-codigo">Código del chismógrafo:</label>
+                <input type="text" id="grupo-codigo" name="grupo-codigo" placeholder="amigos">
+            </div>
+            <button type="button" id="boton-entrar-grupo">¡Entrar!</button>
+            <p id="grupo-error" class="hidden" style="color:#ff4444;"></p>
+        </div>
     </main>
     <script src="js/script.js"></script>
 </body>

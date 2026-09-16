@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const usersListContainer = document.getElementById('users-list');
     const logoutBtn = document.getElementById('logout-btn');
+    const grupoNombreEl = document.getElementById('grupo-actual-nombre');
+    const cambiarGrupoBtn = document.getElementById('cambiar-grupo-btn');
 
     // Guard: solo admins logueados pasan de aquí
     const sesion = await fetch('/api/session').then(r => r.json());
@@ -21,6 +23,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!confirmLogout) return;
         await fetch('/api/logout', { method: 'POST' });
         window.location.href = '/index.html';
+    });
+
+    let grupoActual = sesion.grupo;
+
+    async function elegirGrupo(mensaje) {
+        const codigo = prompt(mensaje, grupoActual || '');
+        if (codigo === null) return false;
+        const res = await fetch('/api/grupo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ codigo })
+        });
+        const result = await res.json();
+        if (!res.ok) { alert(result.message); return false; }
+        grupoActual = result.grupo;
+        grupoNombreEl.textContent = grupoActual;
+        return true;
+    }
+
+    cambiarGrupoBtn.addEventListener('click', async () => {
+        if (await elegirGrupo('Cambiar a qué chismógrafo:')) cargarListaUsuarios();
     });
 
     async function cargarListaUsuarios() {
@@ -89,6 +112,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }, 2000);
         }
     }
+
+    if (!grupoActual) {
+        await elegirGrupo('¿Qué chismógrafo vas a administrar? (ej. amigos, familia)');
+    }
+    grupoNombreEl.textContent = grupoActual || '(ninguno)';
 
     cargarListaUsuarios();
 });
