@@ -697,6 +697,68 @@ button:hover, button:active {
     box-shadow: 0 4px 8px rgba(255, 68, 68, 0.4);
 }
 
+/* --- Botón de editar (mismo tamaño que el de eliminar) --- */
+.edit-btn {
+    background-color: #2c7ac9;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(44, 122, 201, 0.3);
+    flex-shrink: 0;
+    margin-right: 8px;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+.edit-btn:hover, .edit-btn:active {
+    background-color: #1f5a94;
+    transform: scale(1.05);
+}
+
+.admin-row-botones {
+    display: flex;
+    flex-shrink: 0;
+}
+
+/* --- Fila para crear grupos/preguntas/respuestas nuevas --- */
+.admin-crear-fila {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1em;
+}
+
+.admin-crear-fila input {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+}
+
+.admin-crear-fila button {
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-family: 'Gochi Hand', cursive;
+    font-size: 1em;
+}
+
+.admin-crear-fila button:hover {
+    background-color: #4a9d4a;
+}
+
 .loading-text {
     text-align: center;
     color: #666;

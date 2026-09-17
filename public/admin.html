@@ -29,9 +29,44 @@
         </div>
 
         <div class="admin-section">
+            <h2>Chismógrafos (grupos)</h2>
+            <div id="grupos-list">
+                <p class="loading-text">Cargando grupos...</p>
+            </div>
+            <div class="admin-crear-fila">
+                <input type="text" id="nuevo-grupo-codigo" placeholder="código a mano (opcional)">
+                <button id="generar-grupo-btn">Generar código nuevo</button>
+            </div>
+        </div>
+
+        <div class="admin-section">
             <h2>Amigos registrados (entraron con Google)</h2>
             <div id="users-list">
                 <p class="loading-text">Cargando cuentas...</p>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2>Preguntas de este chismógrafo</h2>
+            <div id="preguntas-list">
+                <p class="loading-text">Cargando preguntas...</p>
+            </div>
+            <div class="admin-crear-fila">
+                <input type="text" id="nueva-pregunta-texto" placeholder="Nueva pregunta...">
+                <button id="crear-pregunta-btn">Agregar</button>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2>Respuestas de este chismógrafo</h2>
+            <div id="respuestas-list">
+                <p class="loading-text">Cargando respuestas...</p>
+            </div>
+            <div class="admin-crear-fila admin-crear-respuesta">
+                <input type="text" id="nueva-resp-usuario" placeholder="Usuario">
+                <input type="text" id="nueva-resp-pregunta" placeholder="Pregunta">
+                <input type="text" id="nueva-resp-texto" placeholder="Respuesta">
+                <button id="crear-respuesta-btn">Agregar</button>
             </div>
         </div>
 

@@ -128,8 +128,13 @@ app.post('/api/logout', (req, res) => {
     req.session.destroy(() => res.status(200).json({ message: 'Sesión cerrada.' }));
 });
 
-// Elegir o cambiar de chismógrafo (grupo). Sirve tanto para amigos como para el admin.
+// Elegir chismógrafo. Un usuario normal solo puede elegirlo la primera vez;
+// después solo el admin puede moverlo, para evitar que se cambien de grupo por error.
 app.post('/api/grupo', requireUser, (req, res) => {
+    if (req.session.user.role !== 'admin' && req.session.user.grupo) {
+        return res.status(403).json({ message: 'Ya perteneces a un chismógrafo. Solo el admin puede cambiarte de grupo.' });
+    }
+
     const grupo = normalizarGrupo(req.body.codigo);
     if (!grupo) return res.status(400).json({ message: 'Escribe un código de grupo válido (ej. amigos, familia-isra).' });
 
@@ -262,6 +267,123 @@ app.get('/api/resultados', requireUser, requireGrupo, (req, res) => {
     });
 
     res.json({ preguntas: todasLasPreguntas, participantes: participantesOrdenados });
+});
+
+// --- ADMIN: editar/borrar preguntas del grupo actual ---
+app.put('/api/admin/preguntas/:index', requireAdmin, requireGrupo, (req, res) => {
+    const { texto } = req.body;
+    if (!texto || !texto.trim()) return res.status(400).json({ message: 'La pregunta no puede estar vacía.' });
+    const todasLasPreguntas = leerDatos(PREGUNTAS_DB_FILE, 'object');
+    const lista = todasLasPreguntas[req.session.user.grupo] || [];
+    const index = Number(req.params.index);
+    if (!lista[index]) return res.status(404).json({ message: 'Pregunta no encontrada.' });
+    lista[index] = texto.trim();
+    escribirDatos(PREGUNTAS_DB_FILE, todasLasPreguntas);
+    res.status(200).json({ message: 'Pregunta actualizada.' });
+});
+app.delete('/api/admin/preguntas/:index', requireAdmin, requireGrupo, (req, res) => {
+    const todasLasPreguntas = leerDatos(PREGUNTAS_DB_FILE, 'object');
+    const lista = todasLasPreguntas[req.session.user.grupo] || [];
+    const index = Number(req.params.index);
+    if (!lista[index]) return res.status(404).json({ message: 'Pregunta no encontrada.' });
+    lista.splice(index, 1);
+    escribirDatos(PREGUNTAS_DB_FILE, todasLasPreguntas);
+    res.status(200).json({ message: 'Pregunta eliminada.' });
+});
+
+// --- ADMIN: ver/crear/editar/borrar respuestas del grupo actual ---
+// Cada "entrada" de respuestas.json puede traer varias preguntas respondidas;
+// aquí las aplanamos a filas (entryId + index) para que sean fáciles de administrar.
+app.get('/api/admin/respuestas', requireAdmin, requireGrupo, (req, res) => {
+    const respuestas = leerDatos(RESPUESTAS_DB_FILE).filter(e => e.grupo === req.session.user.grupo);
+    const filas = respuestas.flatMap(entry =>
+        entry.respuestas.map((r, index) => ({
+            entryId: entry.id, index, usuario: entry.usuario, fecha: entry.fecha,
+            pregunta: r.pregunta, respuesta: r.respuesta
+        }))
+    );
+    res.json(filas);
+});
+app.post('/api/admin/respuestas', requireAdmin, requireGrupo, (req, res) => {
+    const { usuario, pregunta, respuesta } = req.body;
+    if (!usuario || !pregunta || !respuesta) return res.status(400).json({ message: 'Faltan datos (usuario, pregunta y respuesta).' });
+    const respuestas = leerDatos(RESPUESTAS_DB_FILE);
+    respuestas.push({
+        usuario: usuario.trim(), grupo: req.session.user.grupo,
+        respuestas: [{ pregunta, respuesta: respuesta.trim() }],
+        id: Date.now(), fecha: new Date().toLocaleString("es-MX")
+    });
+    escribirDatos(RESPUESTAS_DB_FILE, respuestas);
+    res.status(201).json({ message: 'Respuesta agregada.' });
+});
+app.put('/api/admin/respuestas/:entryId', requireAdmin, requireGrupo, (req, res) => {
+    const { index, respuesta } = req.body;
+    if (respuesta === undefined || !respuesta.trim()) return res.status(400).json({ message: 'La respuesta no puede estar vacía.' });
+    const respuestas = leerDatos(RESPUESTAS_DB_FILE);
+    const entry = respuestas.find(e => e.id === Number(req.params.entryId) && e.grupo === req.session.user.grupo);
+    if (!entry || !entry.respuestas[index]) return res.status(404).json({ message: 'Respuesta no encontrada.' });
+    entry.respuestas[index].respuesta = respuesta.trim();
+    escribirDatos(RESPUESTAS_DB_FILE, respuestas);
+    res.status(200).json({ message: 'Respuesta actualizada.' });
+});
+app.delete('/api/admin/respuestas/:entryId', requireAdmin, requireGrupo, (req, res) => {
+    const index = Number(req.query.index);
+    let respuestas = leerDatos(RESPUESTAS_DB_FILE);
+    const entry = respuestas.find(e => e.id === Number(req.params.entryId) && e.grupo === req.session.user.grupo);
+    if (!entry || !entry.respuestas[index]) return res.status(404).json({ message: 'Respuesta no encontrada.' });
+    entry.respuestas.splice(index, 1);
+    if (entry.respuestas.length === 0) respuestas = respuestas.filter(e => e !== entry);
+    escribirDatos(RESPUESTAS_DB_FILE, respuestas);
+    res.status(200).json({ message: 'Respuesta eliminada.' });
+});
+
+// --- ADMIN: administrar los chismógrafos (grupos) que existen ---
+function listarCodigosDeGrupo() {
+    const preguntasDB = leerDatos(PREGUNTAS_DB_FILE, 'object');
+    const usersDB = leerDatos(USERS_DB_FILE, 'object');
+    const respuestas = leerDatos(RESPUESTAS_DB_FILE);
+    const codigos = new Set(Object.keys(preguntasDB));
+    (usersDB.users || []).forEach(u => u.grupo && codigos.add(u.grupo));
+    respuestas.forEach(r => r.grupo && codigos.add(r.grupo));
+    return codigos;
+}
+app.get('/api/admin/grupos', requireAdmin, (req, res) => {
+    const preguntasDB = leerDatos(PREGUNTAS_DB_FILE, 'object');
+    const usersDB = leerDatos(USERS_DB_FILE, 'object');
+    const respuestas = leerDatos(RESPUESTAS_DB_FILE);
+    const grupos = [...listarCodigosDeGrupo()].map(codigo => ({
+        codigo,
+        preguntas: (preguntasDB[codigo] || []).length,
+        respuestas: respuestas.filter(r => r.grupo === codigo).length,
+        usuarios: (usersDB.users || []).filter(u => u.grupo === codigo).length
+    }));
+    res.json(grupos);
+});
+// ponytail: código corto al azar (base36); si por casualidad choca con uno que ya existe
+// simplemente se reutiliza ese grupo, no hace falta reintentar para un grupo de amigos.
+app.post('/api/admin/grupos', requireAdmin, (req, res) => {
+    const codigo = normalizarGrupo(req.body.codigo) || Math.random().toString(36).slice(2, 8);
+    const preguntasDB = leerDatos(PREGUNTAS_DB_FILE, 'object');
+    if (!preguntasDB[codigo]) preguntasDB[codigo] = [];
+    escribirDatos(PREGUNTAS_DB_FILE, preguntasDB);
+    res.status(201).json({ codigo });
+});
+app.delete('/api/admin/grupos/:codigo', requireAdmin, (req, res) => {
+    const codigo = req.params.codigo;
+    const preguntasDB = leerDatos(PREGUNTAS_DB_FILE, 'object');
+    delete preguntasDB[codigo];
+    escribirDatos(PREGUNTAS_DB_FILE, preguntasDB);
+
+    const respuestas = leerDatos(RESPUESTAS_DB_FILE).filter(r => r.grupo !== codigo);
+    escribirDatos(RESPUESTAS_DB_FILE, respuestas);
+
+    const usersDB = leerDatos(USERS_DB_FILE, 'object');
+    (usersDB.users || []).forEach(u => { if (u.grupo === codigo) u.grupo = null; });
+    if (usersDB.admin && usersDB.admin.grupo === codigo) usersDB.admin.grupo = null;
+    escribirDatos(USERS_DB_FILE, usersDB);
+    if (req.session.user.grupo === codigo) req.session.user.grupo = null;
+
+    res.status(200).json({ message: `Chismógrafo "${codigo}" eliminado.` });
 });
 
 // --- INICIO DEL SERVIDOR ---

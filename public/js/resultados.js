@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const prevButton = document.getElementById('prev-button');
     const nextButton = document.getElementById('next-button');
     const logoutBtn = document.getElementById('logout-btn');
-    const cambiarGrupoBtn = document.getElementById('cambiar-grupo-btn');
     const grupoNombreEl = document.getElementById('grupo-actual-nombre');
 
     grupoNombreEl.textContent = sesion.grupo;
@@ -33,19 +32,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     logoutBtn.addEventListener('click', async () => {
         await fetch('/api/logout', { method: 'POST' });
         window.location.href = '/index.html';
-    });
-
-    cambiarGrupoBtn.addEventListener('click', async () => {
-        const codigo = prompt('¿A cuál chismógrafo te quieres cambiar?', sesion.grupo);
-        if (codigo === null) return;
-        const res = await fetch('/api/grupo', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ codigo })
-        });
-        const result = await res.json();
-        if (!res.ok) { alert(result.message); return; }
-        window.location.reload();
     });
 
     // --- FUNCIÓN PARA CARGAR LOS RESULTADOS DESDE LA API ---
