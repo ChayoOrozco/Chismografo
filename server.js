@@ -128,13 +128,8 @@ app.post('/api/logout', (req, res) => {
     req.session.destroy(() => res.status(200).json({ message: 'Sesión cerrada.' }));
 });
 
-// Elegir chismógrafo. Un usuario normal solo puede elegirlo la primera vez;
-// después solo el admin puede moverlo, para evitar que se cambien de grupo por error.
+// Elegir o cambiar de chismógrafo (grupo). Sirve tanto para amigos como para el admin.
 app.post('/api/grupo', requireUser, (req, res) => {
-    if (req.session.user.role !== 'admin' && req.session.user.grupo) {
-        return res.status(403).json({ message: 'Ya perteneces a un chismógrafo. Solo el admin puede cambiarte de grupo.' });
-    }
-
     const grupo = normalizarGrupo(req.body.codigo);
     if (!grupo) return res.status(400).json({ message: 'Escribe un código de grupo válido (ej. amigos, familia-isra).' });
 
